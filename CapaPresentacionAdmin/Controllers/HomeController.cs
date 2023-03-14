@@ -21,12 +21,15 @@ namespace CapaPresentacionAdmin.Controllers
             return View();
         }
 
+        [HttpGet]
         public JsonResult ListarUsuarios() {
             List < Usuario > oLista = new List<Usuario>();
             oLista = new CN_Usuarios().Listar();
 
-            return Json(oLista, JsonRequestBehavior.AllowGet);
-            //return Json( new {elemento = oLista, estado = true } , JsonRequestBehavior.AllowGet);
+            //return Json(oLista, JsonRequestBehavior.AllowGet);
+
+            //Estructura que recibe la libreria de Json
+            return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
 
         }
 
