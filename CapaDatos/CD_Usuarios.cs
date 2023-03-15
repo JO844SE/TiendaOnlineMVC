@@ -51,5 +51,121 @@ namespace CapaDatos
             }
             return lista;
         }
+
+
+        //procedimiento almacenado para registrar usuarios 
+        public int Registrar(Usuario obj, out string Mensaje)
+        {
+            int idautogenerado = 0;
+            Mensaje = string.Empty;//Mensaje vacio
+
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                {
+
+                    SqlCommand cmd = new SqlCommand("SP_RegistrarUsuario", oconexion); //Ejecuta el procedimiento almacenado
+                    cmd.Parameters.AddWithValue("Nombres", obj.Nombres);//Paramétros de entrada
+                    cmd.Parameters.AddWithValue("Apellidos", obj.Apellidos);
+                    cmd.Parameters.AddWithValue("Correo", obj.Correo);
+                    cmd.Parameters.AddWithValue("Clave", obj.Clave);
+                    cmd.Parameters.AddWithValue("Activo", obj.Activo);
+                    //Paramétros de salida 
+                    cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+                    cmd.CommandType = CommandType.StoredProcedure;//tipo de comando, procedimiento almacenado
+
+
+
+                    oconexion.Open();//Abrimos la conexion
+
+                    cmd.ExecuteNonQuery();
+
+                    idautogenerado = Convert.ToInt32(cmd.Parameters["Resultado"].Value);
+                    Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                idautogenerado = 0;
+                Mensaje = ex.Message;
+            }
+
+            return idautogenerado;
+        }
+
+
+
+        //procedimiento almacenado para editar usuarios
+        public bool Editar(Usuario obj, out string Mensaje)
+        {
+            bool resultado = false;
+            Mensaje = string.Empty;//Mensaje vacio
+
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                {
+
+                    SqlCommand cmd = new SqlCommand("SP_EditarUsuario", oconexion); //Ejecuta el procedimiento almacenado
+                    cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);//Paramétros de entrada
+                    cmd.Parameters.AddWithValue("Nombres", obj.Nombres);
+                    cmd.Parameters.AddWithValue("Apellidos", obj.Apellidos);
+                    cmd.Parameters.AddWithValue("Correo", obj.Correo);
+                    cmd.Parameters.AddWithValue("Activo", obj.Activo);
+                    //Paramétros de salida 
+                    cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+                    cmd.CommandType = CommandType.StoredProcedure;//tipo de comando, procedimiento almacenado
+
+                    oconexion.Open();//Abrimos la conexion
+                    cmd.ExecuteNonQuery();
+
+                    resultado = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
+                    Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                resultado = false;
+                Mensaje = ex.Message;
+            }
+            return resultado;
+        }
+
+
+        //procedimiento almacenado para Eliminar usuarios
+        public bool Eliminar(int id, out string Mensaje)
+        {
+            bool resultado = false;
+            Mensaje = string.Empty;//Mensaje vacio
+
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                {
+
+                    SqlCommand cmd = new SqlCommand("delete top(1) from USUARIO where IdUsuario = @id", oconexion); //Ejecuta el procedimiento almacenado
+                    cmd.Parameters.AddWithValue("id", id);//Paramétros de entrada
+                    //Paramétros de salida 
+                    cmd.CommandType = CommandType.Text;//tipo de comando, texto
+                    oconexion.Open();//Abrimos la conexion
+                    resultado = cmd.ExecuteNonQuery() > 0 ? true : false;//Ejecutamos el comando
+
+                }
+            }
+            catch (Exception ex)
+            {
+                resultado = false;
+                Mensaje = ex.Message;
+            }
+            return resultado;
+        }
+
+
     }
 }

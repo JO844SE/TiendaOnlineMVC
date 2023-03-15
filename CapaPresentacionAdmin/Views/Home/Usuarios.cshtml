@@ -51,23 +51,23 @@
                 <h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body g-2">
+            <div class="modal-body ">
                 <input id="txtid" type="text" value="0"/>
 
-                <div class="row">
+                <div class="row g-2">
                     <div class="col-sm-6">
                         <label for="txtnombres" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="txtnombres">
+                        <input type="text" class="form-control" id="txtnombres" autocomplete="off">
                     </div>
 
                     <div class="col-sm-6">
                         <label for="txtapellidos" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="txtapellidos">
+                        <input type="text" class="form-control" id="txtapellidos" autocomplete="off">
                     </div>
 
                     <div class="col-sm-6">
                         <label for="txtcorreo" class="form-label">Correo</label>
-                        <input type="text" class="form-control" id="txtcorreo">
+                        <input type="text" class="form-control" id="txtcorreo" autocomplete="off">
                     </div>
                     
                     <div class="col-sm-6">
@@ -77,6 +77,15 @@
                             <option value="0">No</option>
                         </select>
                     </div>
+
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div id="mensajeError" class="alert alert-danger" role="alert">
+                                A simple danger alert—check it out!
+                            </div>
+                        </div>
+                    </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -140,6 +149,8 @@
             $("#txtcorreo").val("");
             $("#cboactivo").val(1);
 
+            $("#mensajeError").hide();
+
 
             if (json != null) {
                 $("#txtid").val(json.IdUsuario);
@@ -171,12 +182,49 @@
                 Nombres: $("#txtnombres").val()
             }
 
-            if (Usuario.IdUsuario == 0) {
-                tabladata.row.add(Usuario).draw(false);
-            } else {
-                tabladata.row(filaSeleccionada).data(Usuario).draw(false);
-            }
-            $("#FormModal").modal("hide");
+
+            jQuery.ajax({
+                url: '@Url.Action("GuardarUsuario", "Home")',
+                type: "POST",
+                data: JSON.stringify({ objeto: Usuario }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) { //El data son los mensajes resultados y demas valores que se esten enviando
+                    debugger;
+                    //USUARIO NUEVO
+                    if (Usuario.IdUsuario == 0) {
+                        if (data.resultado != 0) {
+                            Usuario.IdUsuario = data.resultado;
+                            tabladata.row.add(Usuario).draw(false);
+                            $("#FormModal").modal("hide");
+                        } else {
+                            $("#mensajeError").text(data.mensaje);
+                            $("#mensajeError").show();
+                        }
+
+                         //USUARIO EDITAR
+                    } else {
+
+                        if (data.resultado) {
+                            tabladata.row(filaSeleccionada).data(Usuario).draw(false);
+                            filaSeleccionada = null;
+                            $("#FormModal").modal("hide");
+                        } else {
+                            $("#mensajeError").text(data.mensaje);
+                            $("#mensajeError").show();
+                        }
+                       
+                    }
+                },
+                error: function () {
+
+                },
+                beforeSend: function () {
+
+                }
+            });
+           
+            
         }
     </script>
 
