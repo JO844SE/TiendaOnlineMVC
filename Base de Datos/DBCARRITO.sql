@@ -20,12 +20,22 @@ FechaRegistro datetime default getdate()
 )
 GO
 
+CREATE TABLE UNIDAD(
+IdUnidad int primary key identity,
+Descripcion varchar(100),
+Activo bit default 1,
+FechaRegistro datetime default getdate()
+)
+GO
+
+
 CREATE TABLE PRODUCTO(
 IdProducto int primary key identity,
 Nombre varchar (500),
 Descripcion varchar (500),
 IdMarca int references Marca(IdMarca),
 IdCategoria int references Categoria(IdCategoria),
+IdUnidad int references Unidad(IdUnidad),
 Precio decimal (10,2) default 0,
 Stock int,
 RutaImagen varchar(100),
@@ -171,6 +181,224 @@ go
 
 
 
+/* ---------- PROCEDIMIENTOS PARA CATEGORIA -----------------*/
+
+create PROC SP_RegistrarCategoria(
+@Descripcion varchar(100),
+@Activo bit,
+@Resultado int output,
+@Mensaje varchar(500) output
+)as
+begin
+	SET @Resultado = 0
+	IF NOT EXISTS (SELECT * FROM CATEGORIA WHERE Descripcion = @Descripcion)
+	begin
+		insert into CATEGORIA(Descripcion,Activo) values (@Descripcion,@Activo)
+		set @Resultado = SCOPE_IDENTITY()
+	end
+	ELSE
+		set @Mensaje = 'La categoría ya existe'
+
+end
+go
+
+
+
+
+Create procedure SP_EditarCategoria(
+@IdCategoria int,
+@Descripcion varchar(100),
+@Activo bit,
+@Resultado bit output,
+@Mensaje varchar(500) output
+)
+as
+begin
+	SET @Resultado = 1
+	IF NOT EXISTS (SELECT * FROM CATEGORIA WHERE Descripcion =@Descripcion and IdCategoria != @IdCategoria)
+		update top (1) CATEGORIA set
+		Descripcion = @Descripcion,
+		Activo = @Activo
+		where IdCategoria = @IdCategoria
+	ELSE
+	begin
+		SET @Resultado = 0
+		set @Mensaje = 'La categoría ya existe'
+	end
+end
+go
+
+
+create procedure SP_EliminarCategoria(
+@IdCategoria int,
+@Resultado bit output,
+@Mensaje varchar(500) output
+)
+as
+begin
+	SET @Resultado = 1
+	IF NOT EXISTS (
+	 select *  from CATEGORIA c
+	 inner join PRODUCTO p on p.IdCategoria = c.IdCategoria
+	 where c.IdCategoria = @IdCategoria
+	)
+	begin
+	 delete top (1) from CATEGORIA where IdCategoria = @IdCategoria
+	end
+	ELSE
+	begin
+		SET @Resultado = 0
+		set @Mensaje = 'La categoria se encuentara relacionada a un producto'
+	end
+end
+GO
+
+
+/* ---------- PROCEDIMIENTOS PARA MARCA -----------------*/
+
+create PROC SP_RegistrarMarca(
+@Descripcion varchar(100),
+@Activo bit,
+@Resultado int output,
+@Mensaje varchar(500) output
+)as
+begin
+	SET @Resultado = 0
+	IF NOT EXISTS (SELECT * FROM MARCA WHERE Descripcion = @Descripcion)
+	begin
+		insert into MARCA(Descripcion,Activo) values (@Descripcion,@Activo)
+		set @Resultado = SCOPE_IDENTITY()
+	end
+	ELSE
+		set @Mensaje = 'La marca ya existe'
+
+end
+go
+
+
+
+
+Create procedure SP_EditarMarca(
+@IdMarca int,
+@Descripcion varchar(100),
+@Activo bit,
+@Resultado bit output,
+@Mensaje varchar(500) output
+)
+as
+begin
+	SET @Resultado = 1
+	IF NOT EXISTS (SELECT * FROM MARCA WHERE Descripcion =@Descripcion and IdMarca != @IdMarca)
+		update top (1) MARCA set
+		Descripcion = @Descripcion,
+		Activo = @Activo
+		where IdMarca = @IdMarca
+	ELSE
+	begin
+		SET @Resultado = 0
+		set @Mensaje = 'La marca ya existe'
+	end
+end
+go
+
+
+create procedure SP_EliminarMarca(
+@IdMarca int,
+@Resultado bit output,
+@Mensaje varchar(500) output
+)
+as
+begin
+	SET @Resultado = 1
+	IF NOT EXISTS (
+	 select *  from MARCA m
+	 inner join PRODUCTO p on p.IdCategoria = m.IdMarca
+	 where m.IdMarca = @IdMarca
+	)
+	begin
+	 delete top (1) from MARCA where IdMarca = @IdMarca
+	end
+	ELSE
+	begin
+		SET @Resultado = 0
+		set @Mensaje = 'La marca se encuentara relacionada a un producto'
+	end
+end
+GO
+
+
+
+/* ---------- PROCEDIMIENTOS PARA UNIDAD DE MEDIDA -----------------*/
+
+create PROC SP_RegistrarUnidad(
+@Descripcion varchar(100),
+@Activo bit,
+@Resultado int output,
+@Mensaje varchar(500) output
+)as
+begin
+	SET @Resultado = 0
+	IF NOT EXISTS (SELECT * FROM UNIDAD WHERE Descripcion = @Descripcion)
+	begin
+		insert into UNIDAD(Descripcion,Activo) values (@Descripcion,@Activo)
+		set @Resultado = SCOPE_IDENTITY()
+	end
+	ELSE
+		set @Mensaje = 'La unidad de medida ya existe'
+
+end
+go
+
+
+
+
+Create procedure SP_EditarUnidad(
+@IdUnidad int,
+@Descripcion varchar(100),
+@Activo bit,
+@Resultado bit output,
+@Mensaje varchar(500) output
+)
+as
+begin
+	SET @Resultado = 1
+	IF NOT EXISTS (SELECT * FROM UNIDAD WHERE Descripcion =@Descripcion and IdUnidad != @IdUnidad)
+		update top (1) UNIDAD set
+		Descripcion = @Descripcion,
+		Activo = @Activo
+		where IdUnidad = @IdUnidad
+	ELSE
+	begin
+		SET @Resultado = 0
+		set @Mensaje = 'La unidad de medida ya existe'
+	end
+end
+go
+
+
+create procedure SP_EliminarUnidad(
+@IdUnidad int,
+@Resultado bit output,
+@Mensaje varchar(500) output
+)
+as
+begin
+	SET @Resultado = 1
+	IF NOT EXISTS (
+	 select *  from UNIDAD u
+	 inner join PRODUCTO p on p.IdUnidad = u.IdUnidad
+	 where u.IdUnidad = @IdUnidad
+	)
+	begin
+	 delete top (1) from UNIDAD where IdUnidad = @IdUnidad
+	end
+	ELSE
+	begin
+		SET @Resultado = 0
+		set @Mensaje = 'La unidad de medida se encuentara relacionada a un producto'
+	end
+end
+GO
 
 
 /* INSERT USUARIO */
@@ -192,6 +420,15 @@ insert into marca (Descripcion) values
 ('LGTE'),
 ('CANON'),
 ('SAMSUNG')
+
+
+/* INSERT UNIDAD */
+select * from UNIDAD
+insert into UNIDAD(Descripcion) values
+('Unidad'),
+('Libra'),
+('Quintal'),
+('Litro')
 
 /* INSERT DEPARTAMENTO */
 select * from departamento
