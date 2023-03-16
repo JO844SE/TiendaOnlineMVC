@@ -20,7 +20,8 @@ namespace CapaPresentacionAdmin.Controllers
             return View();
         }
 
-
+        //+++++++++++++++++++++++++++++++++++++ CATEGORIA ++++++++++++++++++++++++++++++++++++++++++++++++
+        #region CATEGORIA
         //Controlador para listar una categoria
         [HttpGet]
         public JsonResult ListarCategoria()
@@ -67,9 +68,10 @@ namespace CapaPresentacionAdmin.Controllers
             return Json(new { resultado = respuesta, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
         }
 
+        #endregion
 
-
-
+        //+++++++++++++++++++++++++++++++++++++ MARCA ++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #region MARCA
         //Controlador para listar una marca
         [HttpGet]
         public JsonResult ListarMarca()
@@ -116,10 +118,10 @@ namespace CapaPresentacionAdmin.Controllers
             return Json(new { resultado = respuesta, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
         }
 
+        #endregion
 
-
-
-
+        //+++++++++++++++++++++++++++++++++++++ UNIDAD DE MEDIDA +++++++++++++++++++++++++++++++++++++++++
+        #region UNIDAD DE MEDIDA
         //Controlador para listar una unidad de medida
         [HttpGet]
         public JsonResult ListarUnidad()
@@ -166,9 +168,9 @@ namespace CapaPresentacionAdmin.Controllers
             return Json(new { resultado = respuesta, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
         }
 
+        #endregion
 
-
-        //+++++++++++++++++++++++++++++++++++++ PRODUCTO ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //+++++++++++++++++++++++++++++++++++++ PRODUCTO +++++++++++++++++++++++++++++++++++++++++++++++++
         #region PRODUCTO
         [HttpGet]
         public JsonResult ListarProducto()
@@ -254,7 +256,7 @@ namespace CapaPresentacionAdmin.Controllers
                     }
                     else
                     {
-                        mensaje = "Se guardo el producto pero hubo problemas con la imágen"
+                        mensaje = "Se guardo el producto pero hubo problemas con la imágen";
                     }
                 }
             }
@@ -264,6 +266,27 @@ namespace CapaPresentacionAdmin.Controllers
         }
 
 
+        //Recupera la imagen de cada producto 
+        [HttpPost]
+        public JsonResult ImagenProducto(int id)
+        {
+            bool conversion;
+            Producto oProducto = new CN_Producto().Listar().Where(p => p.IdProducto == id).FirstOrDefault();
+            string textoBase64 = CN_Recursos.ConvertirBase64(Path.Combine(oProducto.RutaImagen,oProducto.NombreImagen), out conversion);
+
+
+            return Json(new
+            {
+                conversion = conversion,
+                textobase64 = textoBase64,
+                extension = Path.GetExtension(oProducto.NombreImagen)
+            },
+            JsonRequestBehavior.AllowGet
+            );
+        }
+
+
+        //Elimina un producto
         [HttpPost]
         public JsonResult EliminarProducto(int id)
         {
