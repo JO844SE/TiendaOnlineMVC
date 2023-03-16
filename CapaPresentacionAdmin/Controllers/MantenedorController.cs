@@ -3,7 +3,9 @@ using CapaNegocio;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -228,13 +230,37 @@ namespace CapaPresentacionAdmin.Controllers
             {
                 if (archivoImagen != null)
                 {
+                    string ruta_guardar = ConfigurationManager.AppSettings["ServidorFotos"];
+                    string extension = Path.GetExtension(archivoImagen.FileName);
+                    string nombre_imagen = string.Concat(oProducto.IdProducto.ToString(), extension);
 
+
+                    try
+                    {
+                        archivoImagen.SaveAs(Path.Combine(ruta_guardar, nombre_imagen));
+                    }
+                    catch (Exception ex)
+                    {
+                        string msg = ex.Message;
+                        guardar_imagen_exito = false;
+                       
+                    }
+
+                    if (guardar_imagen_exito)
+                    {
+                        oProducto.RutaImagen = ruta_guardar;
+                        oProducto.Nombre = nombre_imagen;
+                        bool respuesta = new CN_Producto().GuardarDatosImagen(oProducto, out mensaje);
+                    }
+                    else
+                    {
+                        mensaje = "Se guardo el producto pero hubo problemas con la imágen"
+                    }
                 }
             }
 
 
-
-            return Json(new { resultado = resultado, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
+            return Json(new { operacionExitosa = operacion_exitosa, idGenerado=oProducto.IdProducto, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
         }
 
 
