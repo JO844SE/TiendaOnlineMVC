@@ -1,7 +1,9 @@
 ﻿using CapaEntidad;
 using CapaNegocio;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -164,6 +166,90 @@ namespace CapaPresentacionAdmin.Controllers
 
 
 
+        //+++++++++++++++++++++++++++++++++++++ PRODUCTO ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #region PRODUCTO
+        [HttpGet]
+        public JsonResult ListarProducto()
+        {
+            List<Producto> oLista = new List<Producto>();
+            oLista = new CN_Producto().Listar();
+
+            //return Json(oLista, JsonRequestBehavior.AllowGet);
+
+            //Estructura que recibe la libreria de Json
+            return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
+
+        }
+
+
+        [HttpPost]
+        public JsonResult GuardarProducto(string objeto, HttpPostedFileBase archivoImagen)
+        {
+            object resultado;
+            string mensaje = string.Empty;
+            bool operacion_exitosa = true;
+            bool guardar_imagen_exito = true;
+
+
+            Producto oProducto = new Producto();
+            oProducto = JsonConvert.DeserializeObject<Producto>(objeto);
+
+            decimal precio;
+
+            if (decimal.TryParse(oProducto.PrecioTexto,NumberStyles.AllowDecimalPoint,new CultureInfo("es-GT"), out precio))
+            {
+                oProducto.Precio = precio;
+            }
+            else
+            {
+                return Json(new { operacion_exitosa = false, mensaje = "El formato del precio debe ser ##.##" }, JsonRequestBehavior.AllowGet);
+            }
+
+
+            if (oProducto.IdProducto == 0)
+            {
+                int idproductoGenerado = new CN_Producto().Registrar(oProducto, out mensaje);
+                if (idproductoGenerado != 0)
+                {
+                    oProducto.IdProducto = idproductoGenerado;
+                }
+                else
+                {
+                    operacion_exitosa = false;
+                }
+            }
+            else
+            {
+                resultado = new CN_Producto().Editar(oProducto, out mensaje);
+            }
+
+
+            if (operacion_exitosa)
+            {
+                if (archivoImagen != null)
+                {
+
+                }
+            }
+
+
+
+            return Json(new { resultado = resultado, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public JsonResult EliminarProducto(int id)
+        {
+            object respuesta;
+            string mensaje = string.Empty;
+
+            respuesta = new CN_Producto().Eliminar(id, out mensaje);
+
+            return Json(new { resultado = respuesta, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
 
 
 

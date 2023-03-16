@@ -400,6 +400,114 @@ begin
 end
 GO
 
+/* LISTAR PRODUCTO */
+
+--select p.IdProducto, p.Nombre, p.Descripcion,
+--m.IdMarca, m.Descripcion[DesMarca],
+--c.IdCategoria, c.Descripcion[DesCategoria],
+--u.IdUnidad, u.Descripcion[DesUnidad],
+--p.Precio, p.Stock,p.RutaImagen,p.NombreImagen,p.Activo
+--from PRODUCTO p
+--inner join MARCA m on m.IdMarca = p.IdMarca
+--inner join CATEGORIA c on c.IdCategoria = p.IdCategoria
+--inner join UNIDAD u on u.IdUnidad = p.IdUnidad
+
+
+
+
+/* REGISTRAR PRODUCTO*/
+create proc SP_RegistrarProducto(
+@Nombre varchar(500),
+@Descripcion varchar(500),
+@IdMarca int,
+@IdCategoria int,
+@IdUnidad int,
+@Precio decimal(10,2),
+@Stock int,
+@Activo bit,
+@Mensaje varchar(500),
+@Resultado int output
+)
+as
+begin
+	SET @Resultado = 0
+	IF NOT EXISTS (SELECT * FROM PRODUCTO WHERE Nombre = @Nombre)
+	begin
+		insert into PRODUCTO(Nombre,Descripcion,IdMarca,IdCategoria,IdUnidad,Precio,Stock,Activo) values (
+		@Nombre,@Descripcion,@IdMarca,@IdCategoria,@IdUnidad, @Precio,@Stock,@Activo)
+
+		SET @Resultado = scope_identity()
+	end
+	else
+	set @Mensaje = 'El producto ya existe'
+end
+go
+
+
+/* EDITAR PRODUCTO */
+create proc sp_EditarProducto(
+@IdProducto int,
+@Nombre varchar(500),
+@Descripcion varchar(500),
+@IdMarca varchar(100),
+@IdCategoria varchar(100),
+@IdUnidad varchar(100),
+@Precio decimal(10,2),
+@Stock int,
+@Activo bit,
+@Mensaje varchar(500) output,
+@Resultado bit output
+)
+as
+begin
+	SET @Resultado = 0
+	IF NOT EXISTS (SELECT * FROM PRODUCTO WHERE Nombre = @Nombre and IdProducto != @IdProducto)
+	begin
+		update PRODUCTO set 
+		Nombre = @Nombre,
+		Descripcion = @Descripcion,
+		IdMarca = @IdMarca,
+		IdCategoria = @IdCategoria,
+		IdUnidad = @IdUnidad,
+		Precio =@Precio ,
+		Stock =@Stock ,
+		Activo = @Activo 
+		where IdProducto = @IdProducto
+
+		SET @Resultado = 1
+	end
+	else
+	set @Mensaje = 'El producto ya existe'
+end
+go
+
+
+/* ELIMINAR PRODUCTO */
+create PROC SP_ELIMINARProducto(
+@IdProducto int,
+@Resultado bit output,
+@Mensaje varchar(500) output
+)
+as
+begin
+	set @Resultado = 0
+
+	IF EXISTS (SELECT * FROM DETALLE_VENTA dv
+	INNER JOIN PRODUCTO p ON p.IdProducto = dv.IdProducto
+	WHERE p.IdProducto = @IdProducto)
+	BEGIN
+		delete top(1) from PRODUCTO where IdProducto = @IdProducto
+		set @Resultado = 1 
+	end
+	else
+	set @Mensaje = 'El producto se encuentra relacionado a una venta'
+end
+go
+
+
+
+
+
 
 /* INSERT USUARIO */
 select * from usuario
