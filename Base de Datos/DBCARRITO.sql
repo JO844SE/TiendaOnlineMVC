@@ -425,7 +425,7 @@ create proc SP_RegistrarProducto(
 @Precio decimal(10,2),
 @Stock int,
 @Activo bit,
-@Mensaje varchar(500),
+@Mensaje varchar(500) output,
 @Resultado int output
 )
 as

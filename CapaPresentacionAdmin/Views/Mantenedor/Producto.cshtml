@@ -233,6 +233,9 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
+                    console.log(data);
+                    $("<option>").attr({ "value": "0","disabled":"true" }).text("Seleccionar").appendTo("#cbocategoria");
+
                     $.each(data.data, function (index, value) {
                         $("<option>").attr({ "value": value.IdCategoria }).text(value.Descripcion).appendTo("#cbocategoria");
                     });
@@ -253,6 +256,9 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
+                    console.log(data);
+                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbomarca");
+
                     $.each(data.data, function (index, value) {
                         $("<option>").attr({ "value": value.IdMarca }).text(value.Descripcion).appendTo("#cbomarca");
                     });
@@ -272,9 +278,12 @@
                 data: null,
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $.each(data.data, function (index, value) {
-                        $("<option>").attr({ "value": value.IdMarca }).text(value.Descripcion).appendTo("#cbounidad");
+                   success: function (data) {
+                       console.log(data);
+                       $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbounidad");
+
+                       $.each(data.data, function (index, value) {
+                           $("<option>").attr({ "value": value.IdUnidad }).text(value.Descripcion).appendTo("#cbounidad");
                     });
                 },
                 error: function (error) {
@@ -290,8 +299,9 @@
         //se habre el modal al presionar el botón crear nuevo
         function abrirModal(json) {
             //Limpia los campos del modal form
-            $("#txtid").val(0);
-            $("#img_producto").attr({ "src": "" });
+            $("#txtid").val();
+            $("#img_producto").removeAttr("src");
+            $("#fileProducto").val("");
             $("#txtnombre").val("");
             $("#txtdescripcion").val("");
             $("#cbomarca").val($("#cbomarca option:first").val());
@@ -306,9 +316,6 @@
             if (json != null) {
                 console.log(json)
                 $("#txtid").val(json.IdProducto);
-
-
-                $("#img_producto").attr({ "src": "data:image/" + json.extension + ";base64," + json.base64 });
                 $("#txtnombre").val(json.Nombre);
                 $("#txtdescripcion").val(json.Descripcion);
                 $("#cbomarca").val(json.oMarca.IdMarca);
@@ -378,23 +385,35 @@
             
             var ImagenSeleccionada = ($("#fileProducto"))[0].files[0];
 
-            var objeto = {
+            var Producto = {
                 IdProducto: $("#txtid").val(),
                 Nombre: $("#txtnombre").val(),
                 Descripcion: $("#txtdescripcion").val(),
-                oMarca: {IdMarca : $("#cbomarca option:selected").val()},
-                oCategoria: { IdCategoria: $("#cbocategoria option:selected").val() },
-                oUnidad: { IdUnidad: $("#cbounidad option:selected").val() },
+                oMarca: {
+                    IdMarca: $("#cbomarca option:selected").val(),
+                    Descripcion: $("#cbomarca option:selected").text()
+                },
+                oCategoria: {
+                    IdCategoria: $("#cbocategoria option:selected").val(),
+                    Descripcion: $("#cbocategoria option:selected").text()
+                },
+                oUnidad: {
+                    IdUnidad: $("#cbounidad option:selected").val(),
+                    Descripcion: $("#cbounidad option:selected").text()
+                },
+                PrecioTexto: $("#txtprecio").val(),
                 Precio: $("#txtprecio").val(),
                 Stock: $("#txtstock").val(),
-                RutaImagen : "",
-                Activo: parseInt($("#cboactivo").val()) == 1 ? true : false
+                Activo: parseInt($("#cboactivo").val()) == 1 ? true : false,
             }
 
+            //Convertir archivos a texto para enviar a la base de datos
             var request = new FormData();
-            request.append("imagenArchivo", ImagenSeleccionada);
-            request.append("objeto", JSON.stringify(objeto));
+            request.append("objeto", JSON.stringify(Producto))
+            request.append("archivoImagen", ImagenSeleccionada)
+            
 
+            //Método para guardar el producto
             jQuery.ajax({
                 url: '@Url.Action("GuardarProducto", "Mantenedor")',
                 type: "POST",
@@ -403,18 +422,48 @@
                 contentType : false,
                 success: function (data) {
 
-                    if (data.resultado) {
-                        tabladata.ajax.reload();
-                        $('#FormModal').modal('hide');
+                    $(".modal-body").LoadingOverlay("hide");
+                    //PRODUCTO NUEVO
+                    if (Producto.IdProducto == 0) {
+                        if (data.idGenerado != 0) {
+                            Producto.IdProducto = data.idGenerado;
+                            tabladata.row.add(Producto).draw(false);
+                            $("#FormModal").modal("hide");
+                        } else {
+                            $("#mensajeError").text(data.mensaje);
+                            $("#mensajeError").show();
+                        }
+
+                        //PRODUCTO EDITAR
                     } else {
-                        alert("No se pudo guardar los cambios")
+
+                        if (data.operacionExitosa) {
+                            tabladata.row(filaSeleccionada).data(Producto).draw(false);
+                            filaSeleccionada = null;
+                            $("#FormModal").modal("hide");
+                        } else {
+                            $("#mensajeError").text(data.mensaje);
+                            $("#mensajeError").show();
+                        }
+
                     }
                 },
-                error: function (error) {
-                    console.log(error)
+                error: function (xhr, status, error) {
+                    //$(".modal-body").LoadingOverlay("hide");
+                    //$("#mensajeError").text("Error Ajax");
+                    //$("#mensajeError").show();
+                        var errorMessage = xhr.status + ': ' + xhr.statusText
+                        $(".modal-body").LoadingOverlay("hide");
+                        $("#mensajeError").show();
+                        $("#mensajeError").text(errorMessage);
+                    
                 },
                 beforeSend: function () {
-
+                    $(".modal-body").LoadingOverlay("show", {
+                        imageResizefactor: 2,
+                        text: "Cargando. . .",
+                        size: 14
+                    })
                 },
             });
 

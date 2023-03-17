@@ -189,7 +189,6 @@ namespace CapaPresentacionAdmin.Controllers
         [HttpPost]
         public JsonResult GuardarProducto(string objeto, HttpPostedFileBase archivoImagen)
         {
-            object resultado;
             string mensaje = string.Empty;
             bool operacion_exitosa = true;
             bool guardar_imagen_exito = true;
@@ -200,7 +199,7 @@ namespace CapaPresentacionAdmin.Controllers
 
             decimal precio;
 
-            if (decimal.TryParse(oProducto.PrecioTexto,NumberStyles.AllowDecimalPoint,new CultureInfo("es-GT"), out precio))
+            if (decimal.TryParse(oProducto.PrecioTexto, NumberStyles.AllowDecimalPoint, new CultureInfo("es-PE"), out precio))
             {
                 oProducto.Precio = precio;
             }
@@ -224,7 +223,7 @@ namespace CapaPresentacionAdmin.Controllers
             }
             else
             {
-                resultado = new CN_Producto().Editar(oProducto, out mensaje);
+                operacion_exitosa = new CN_Producto().Editar(oProducto, out mensaje);
             }
 
 

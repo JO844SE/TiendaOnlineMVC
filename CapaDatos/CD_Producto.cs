@@ -79,7 +79,7 @@ namespace CapaDatos
                 {
 
                     SqlCommand cmd = new SqlCommand("SP_RegistrarProducto", oconexion); //Ejecuta el procedimiento almacenado
-                    cmd.Parameters.AddWithValue("Descripcion", obj.Nombre);
+                    cmd.Parameters.AddWithValue("Nombre", obj.Nombre);
                     cmd.Parameters.AddWithValue("Descripcion", obj.Descripcion);//Paramétros de entrada
                     cmd.Parameters.AddWithValue("IdMarca", obj.oMarca.IdMarca);
                     cmd.Parameters.AddWithValue("IdCategoria", obj.oCategoria.IdCategoria);
@@ -166,7 +166,7 @@ namespace CapaDatos
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
                 {
                     string query = "update PRODUCTO set RutaImagen = @rutaimagen, NombreImagen = @nombreimagen where IdProducto = @idproducto ";
-                    SqlCommand cmd = new SqlCommand("SP_RegistrarProducto", oconexion); //Ejecuta el procedimiento almacenado
+                    SqlCommand cmd = new SqlCommand(query, oconexion); //Ejecuta el procedimiento almacenado
                     cmd.Parameters.AddWithValue("@rutaimagen", obj.RutaImagen);
                     cmd.Parameters.AddWithValue("@nombreimagen", obj.NombreImagen);
                     cmd.Parameters.AddWithValue("@idproducto", obj.IdProducto);
