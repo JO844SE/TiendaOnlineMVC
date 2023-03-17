@@ -486,12 +486,13 @@ begin
 	IF EXISTS (SELECT * FROM DETALLE_VENTA dv
 	INNER JOIN PRODUCTO p ON p.IdProducto = dv.IdProducto
 	WHERE p.IdProducto = @IdProducto)
-	BEGIN
+	set @Mensaje = 'El producto se encuentra relacionado a una venta'
+	else
+	begin
+
 		delete top(1) from PRODUCTO where IdProducto = @IdProducto
 		set @Resultado = 1 
 	end
-	else
-	set @Mensaje = 'El producto se encuentra relacionado a una venta'
 end
 go
 

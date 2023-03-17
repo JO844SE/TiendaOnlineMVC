@@ -57,7 +57,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body ">
-                <input id="txtid" type="text" value="0" />
+                <input id="txtid" type="hidden" value="0" />
 
                 <form id="contenedor" class="row">
                     <div class="col-sm-3">
@@ -77,7 +77,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Descripción</label>
-                            <textarea type="text" class="form-control" id="txtdescripcion" name="descripcion" style="height:125px;resize:none"  autocomplete="off"></textarea>
+                            <textarea type="text" class="form-control" id="txtdescripcion" name="descripcion" style="height:125px;resize:none" autocomplete="off"></textarea>
                         </div>
                     </div>
 
@@ -104,36 +104,31 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Stock</label>
-                            <input type="text" class="form-control" id="txtstock" name="stock" autocomplete="off"/>
+                            <input type="text" class="form-control" id="txtstock" name="stock" autocomplete="off" />
                         </div>
 
                         <div class="mb-3">
-                        <label for="cboactivo" class="form-label">Activo</label>
-                        <select id="cboactivo" class="form-select">
-                            <option value="1">Si</option>
-                            <option value="0">No</option>
-                        </select>
+                            <label for="cboactivo" class="form-label">Activo</label>
+                            <select id="cboactivo" class="form-select">
+                                <option value="1">Si</option>
+                                <option value="0">No</option>
+                            </select>
                         </div>
 
                 </form>
-
-
-
-                <div class="row g-1">
-                    @*Mensaje de alerta*@
-                    <div class="row mt-2">
-                        <div class="col-12">
-                            <div id="mensajeError" class="alert alert-danger" role="alert">
-                                A simple danger alert—check it out!
-                            </div>
+            </div>
+            @*Mensaje de alerta*@
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div>
+                        <div id="mensajeError" class="alert alert-danger" role="alert">
                         </div>
                     </div>
-
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
             </div>
         </div>
     </div>
@@ -287,7 +282,43 @@
                 },
             });
 
-        
+
+            //************************ VALIDACION CAJAS DE NÚMEROS **************************************
+
+            jQuery.validator.addMethod("preciodecimal", function (value, element) {
+                return this.optional(element) || /^\d{0,4}(\.\d{0,2})?$/.test(value);
+            }, "El formato correcto del precio es ##.##");
+
+
+
+            $("#contenedor").validate({
+                rules: {
+                    nombre: {
+                        required: true
+                    },
+                    descripcion: {
+                        required: true
+                    },
+                    precio: {
+                        required: true,
+                        preciodecimal: true
+                    },
+                    stock: {
+                        required: true,
+                        number: true
+                    }
+                },
+                messages: {
+                    nombre: "- El campo nombre es obligatorio",
+                    descripcion: "- El campo descripción es obligatorio",
+                    precio: { required: "- El campo precio es obligatorio", preciodecimal: "El formato correcto del precio es ##.##" },
+                    stock: { required: "- El campo stock es obligatorio", preciodecimal: "- Debe ingresar solo numeros en este campo" }
+                },
+                errorElement: "div",
+                errorLabelContainer: ".alert-danger"
+            })
+
+
 
         //se habre el modal al presionar el botón crear nuevo
         function abrirModal(json) {
@@ -317,6 +348,33 @@
                 $("#txtprecio").val(json.Precio);
                 $("#txtstock").val(json.Stock);
                 $("#cboactivo").val(json.Activo == true ? 1 : 0);
+
+
+                //Extraer imagen de eproductos y mostrar
+                 jQuery.ajax({
+                url: '@Url.Action("ImagenProducto", "Mantenedor")',
+                     type: "POST",
+                     data: JSON.stringify({ id: json.IdProducto }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                     success: function (data) {
+                     $("#img_producto").LoadingOverlay("hide");
+                    if (data.conversion) {
+                        $("#img_producto").attr({ "src": "data:image/" + data.extension + ";base64," + data.textobase64 });
+                    }
+                },
+                error: function (error) {
+                    $("#img_producto").LoadingOverlay("hide");
+                    $("#mensajeError").show();
+                    $("#mensajeError").text("Error al mostrar la imágen");
+                },
+                     beforeSend: function () {
+                         $("#img_producto").LoadingOverlay("show");
+                },
+            });
+
+
+
             }
 
             $('#FormModal').modal('show');
@@ -377,7 +435,12 @@
 
 
         function Guardar() {
-            
+
+            if (!$("#contenedor").valid()) {
+                return;
+            }
+
+
             var ImagenSeleccionada = ($("#fileProducto"))[0].files[0];
 
             var Producto = {
@@ -464,10 +527,36 @@
 
 
         }
+
+    
+            $.fn.inputFilter = function (inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            };
+
+            $("#txtstock").inputFilter(function (value) {
+                return /^-?\d*$/.test(value);
+            });
+
+            $("#txtprecio").inputFilter(function (value) {
+                return /^-?\d*[.]?\d{0,2}$/.test(value);
+            });
+
         </script>
+        }
 
 
-    }
+    
 
 
 
