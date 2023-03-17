@@ -400,17 +400,8 @@ begin
 end
 GO
 
-/* LISTAR PRODUCTO */
 
---select p.IdProducto, p.Nombre, p.Descripcion,
---m.IdMarca, m.Descripcion[DesMarca],
---c.IdCategoria, c.Descripcion[DesCategoria],
---u.IdUnidad, u.Descripcion[DesUnidad],
---p.Precio, p.Stock,p.RutaImagen,p.NombreImagen,p.Activo
---from PRODUCTO p
---inner join MARCA m on m.IdMarca = p.IdMarca
---inner join CATEGORIA c on c.IdCategoria = p.IdCategoria
---inner join UNIDAD u on u.IdUnidad = p.IdUnidad
+
 
 
 
@@ -483,7 +474,7 @@ go
 
 
 /* ELIMINAR PRODUCTO */
-create PROC SP_ELIMINARProducto(
+create PROC SP_EliminarProducto(
 @IdProducto int,
 @Resultado bit output,
 @Mensaje varchar(500) output
@@ -505,6 +496,24 @@ end
 go
 
 
+/* LISTAR PRODUCTO*/
+create proc SP_ListarProducto
+as
+begin
+select p.IdProducto, p.Nombre, p.Descripcion,
+m.IdMarca, m.Descripcion[DesMarca],
+c.IdCategoria, c.Descripcion[DesCategoria],
+u.IdUnidad, u.Descripcion[DesUnidad],
+p.Precio, p.Stock,p.RutaImagen,p.NombreImagen,p.Activo
+from PRODUCTO p
+inner join MARCA m on m.IdMarca = p.IdMarca
+inner join CATEGORIA c on c.IdCategoria = p.IdCategoria
+inner join UNIDAD u on u.IdUnidad = p.IdUnidad
+
+
+end
+
+go
 
 
 

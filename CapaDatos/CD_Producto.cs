@@ -12,57 +12,113 @@ namespace CapaDatos
 {
     public class CD_Producto
     {
+
+        #region Listar Comentado
+        //public List<Producto> Listar()
+        //{
+        //    Variable lista del tipo List Producto
+        //    List<Producto> lista = new List<Producto>();
+
+        //    using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+        //    {
+
+        //        try
+        //        {
+
+        //            StringBuilder query = new StringBuilder();
+        //            query.AppendLine("select p.IdProducto, p.Nombre, p.Descripcion, m.IdProducto, m.Descripcion[DesProducto],c.IdCategoria, c.Descripcion[DesCategoria],u.IdUnidad, u.Descripcion[DesUnidad],p.Precio, p.Stock,p.RutaImagen,p.NombreImagen,p.Activo from PRODUCTO p");
+        //            query.AppendLine("inner join Producto m on m.IdProducto = p.IdProducto");
+        //            query.AppendLine("inner join CATEGORIA c on c.IdCategoria = p.IdCategoria");
+        //            query.AppendLine("inner join UNIDAD u on u.IdUnidad = p.IdUnidad");
+
+
+
+        //            SqlCommand se encarga de ejecutar los comandos
+        //            SqlCommand cmd = new SqlCommand(query.ToString(), oconexion) //Convierto el query en una cadena de texto
+        //            {
+        //                El tipo de comando que se ejecuta es texto
+        //                CommandType = CommandType.Text
+        //            };
+        //            oconexion.Open();//Abrimos la conexion
+
+
+        //            using (SqlDataReader dr = cmd.ExecuteReader())
+        //            {
+        //                while (dr.Read())
+        //                {
+        //                    lista.Add(
+        //                        new Producto()
+        //                        {
+        //                            IdProducto = Convert.ToInt32(dr["IdProducto"]),
+        //                            Nombre = dr["Nombre"].ToString(),
+        //                            Descripcion = dr["Descripcion"].ToString(),
+        //                            oMarca = new Marca() { IdMarca = Convert.ToInt32(dr["IdMarca"]), Descripcion = dr["DesMarca"].ToString() },
+        //                            oCategoria = new Categoria() { IdCategoria = Convert.ToInt32(dr["IdCategoria"]), Descripcion = dr["DesCategoria"].ToString() },
+        //                            oUnidad = new Unidad() { IdUnidad = Convert.ToInt32(dr["IdUnidad"]), Descripcion = dr["DesUnidad"].ToString() },
+        //                            Precio = Convert.ToDecimal(dr["Precio"], new CultureInfo("es-GT")),
+        //                            Stock = Convert.ToInt32(dr["Stock"].ToString()),
+        //                            RutaImagen = dr["RutaImagen"].ToString(),
+        //                            NombreImagen = dr["NombreImagen"].ToString(),
+        //                            Activo = Convert.ToBoolean(dr["Activo"])
+        //                        }
+        //                        );
+        //                }
+        //            }
+
+        //        }
+        //        catch (Exception)
+        //        {
+
+        //            lista = new List<Producto>(); //Si hay error,que la lista sea vacia
+        //        }
+        //    }
+
+        //    return lista;
+        //}
+        #endregion
+
         public List<Producto> Listar()
         {
+
             List<Producto> lista = new List<Producto>();
-            try
+            using (SqlConnection oConexion = new SqlConnection(Conexion.cadena))
             {
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                SqlCommand cmd = new SqlCommand("SP_ListarProducto", oConexion);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                try
                 {
-                    StringBuilder query = new StringBuilder();
-                    query.AppendLine("select p.IdProducto, p.Nombre, p.Descripcion,");
-                    query.AppendLine("m.IdProducto, m.Descripcion[DesProducto],");
-                    query.AppendLine("c.IdCategoria, c.Descripcion[DesCategoria],");
-                    query.AppendLine("u.IdUnidad, u.Descripcion[DesUnidad],");
-                    query.AppendLine("p.Precio, p.Stock,p.RutaImagen,p.NombreImagen,p.Activo");
-                    query.AppendLine("from PRODUCTO p");
-                    query.AppendLine("inner join Producto m on m.IdProducto = p.IdProducto");
-                    query.AppendLine("inner join CATEGORIA c on c.IdCategoria = p.IdCategoria");
-                    query.AppendLine("inner join UNIDAD u on u.IdUnidad = p.IdUnidad");
-                    SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
-                    cmd.CommandType = CommandType.Text; /*Se define el tipo de conexion a texto*/
+                    oConexion.Open();
+                    SqlDataReader dr = cmd.ExecuteReader();
 
-                    oconexion.Open();
-
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    while (dr.Read())
                     {
-                        while (dr.Read())
+                        lista.Add(new Producto()
                         {
-                            lista.Add(
-                                new Producto()
-                                {
-                                    IdProducto = Convert.ToInt32(dr["IdProducto"]),
-                                    Nombre = dr["Nombre"].ToString(),
-                                    Descripcion = dr["Descripcion"].ToString(),
-                                    oMarca = new Marca() { IdMarca = Convert.ToInt32(dr["IdMarca"]), Descripcion = dr["DesMarca"].ToString() },
-                                    oCategoria = new Categoria() { IdCategoria = Convert.ToInt32(dr["IdCategoria"]), Descripcion = dr["DesCategoria"].ToString() },
-                                    oUnidad = new Unidad() { IdUnidad = Convert.ToInt32(dr["IdUnidad"]), Descripcion = dr["DesUnidad"].ToString() },
-                                    Precio = Convert.ToDecimal(dr["Precio"], new CultureInfo("es-GT")),
-                                    Stock = Convert.ToInt32(dr["Stock"].ToString()),
-                                    RutaImagen = dr["RutaImagen"].ToString(),
-                                    NombreImagen = dr["NombreImagen"].ToString(),
-                                    Activo = Convert.ToBoolean(dr["Activo"])
-                                }
-                                );
-                        }
+                            IdProducto = Convert.ToInt32(dr["IdProducto"].ToString()),
+                            Nombre = dr["Nombre"].ToString(),
+                            Descripcion = dr["Descripcion"].ToString(),
+                            oMarca = new Marca() { IdMarca = Convert.ToInt32(dr["IdMarca"].ToString()), Descripcion = dr["DesMarca"].ToString() },
+                            oCategoria = new Categoria() { IdCategoria = Convert.ToInt32(dr["IdCategoria"].ToString()), Descripcion = dr["DesCategoria"].ToString() },
+                            oUnidad = new Unidad() { IdUnidad = Convert.ToInt32(dr["IdUnidad"].ToString()), Descripcion = dr["DesUnidad"].ToString() },
+                            Precio = Convert.ToDecimal(dr["Precio"].ToString(), new CultureInfo("es-GT")),
+                            Stock = Convert.ToInt32(dr["Stock"].ToString()),
+                            RutaImagen = dr["RutaImagen"].ToString(),
+                            NombreImagen = dr["NombreImagen"].ToString(),
+                            Activo = Convert.ToBoolean(dr["Activo"].ToString())
+                        });
                     }
+                    dr.Close();
+
+                    return lista;
+
+                }
+                catch (Exception ex)
+                {
+                    lista = null;
+                    return lista;
                 }
             }
-            catch
-            {
-                lista = new List<Producto>(); /*Que sea una lista bacia*/
-            }
-            return lista;
         }
 
 
@@ -126,7 +182,7 @@ namespace CapaDatos
 
                     SqlCommand cmd = new SqlCommand("sp_EditarProducto", oconexion); //Ejecuta el procedimiento almacenado
                     cmd.Parameters.AddWithValue("IdProducto", obj.IdProducto);//Paramétros de entrada
-                    cmd.Parameters.AddWithValue("Descripcion", obj.Nombre);
+                    cmd.Parameters.AddWithValue("Nombre", obj.Nombre);
                     cmd.Parameters.AddWithValue("Descripcion", obj.Descripcion);
                     cmd.Parameters.AddWithValue("IdMarca", obj.oMarca.IdMarca);
                     cmd.Parameters.AddWithValue("IdCategoria", obj.oCategoria.IdCategoria);
@@ -205,7 +261,7 @@ namespace CapaDatos
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
                 {
 
-                    SqlCommand cmd = new SqlCommand("SP_ELIMINARProducto", oconexion); //Ejecuta el procedimiento almacenado
+                    SqlCommand cmd = new SqlCommand("SP_EliminarProducto", oconexion); //Ejecuta el procedimiento almacenado
                     cmd.Parameters.AddWithValue("IdProducto", id);//Paramétros de entrada
                     //Paramétros de salida 
                     cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;

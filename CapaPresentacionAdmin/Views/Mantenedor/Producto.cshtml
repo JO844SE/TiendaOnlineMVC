@@ -162,67 +162,60 @@
             }
 
             
-        $(document).ready(function () {
+    
 
-            tabladata = $('#tabla').DataTable({
-                    responsive:true,
-                    "ajax": {
-                        "url": '@Url.Action("ListarProducto", "Mantenedor")',
-                        "type": "GET",
-                        "datatype": "json"
-                    },
-                    "columns": [
-                        { "data": "Nombre" },
-                        { "data": "Descripcion" },
-                        {
-                            "data": "oMarca", render: function (data) {
+            tabladata = $("#tabla").DataTable({
+            responsive: true,
+            ordering: false,
+            "ajax": {
+                url: '@Url.Action("ListarProducto", "Mantenedor")',
+                type: "GET",
+                dataType: "json"
+            },
+            "columns": [
+                {"data":"Nombre"},
+                { "data": "Descripcion" },
+                {
+                    "data": "oMarca", render: function (data) {
 
-                                return data.Descripcion
-                            }
-                        },
-                        {
-                            "data": "oCategoria", render: function (data) {
-                                return data.Descripcion
-                            }
-                        },
-                        {
-                            "data": "oUnidad", render: function (data) {
-                                return data.Descripcion
-                            }
-                        },
-                        { "data": "Precio" },
-                        { "data": "Stock" },
-                        {
-                            "data": "Activo", "render": function (data) {
-                                if (data) {
-                                    return '<span class="badge bg-success">Activo</span>'
-                                } else {
-                                    return '<span class="badge bg-danger">No Activo</span>'
-                                }
-                            }
-                        },
-                        {
-                            "data": "IdProducto", "render": function (data, type, row, meta) {
-
-                                return $("<button>").addClass("btn btn-primary btn-editar btn-sm").append(
-                                    $("<i>").addClass("fas fa-pen")
-                                ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML
-                                +
-                                $("<button>").addClass("btn btn-danger btn-eliminar btn-sm ms-2").append(
-                                    $("<i>").addClass("fas fa-trash")
-                                ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML;
-
-                            },
-                            "orderable": false,
-                            "searchable": false,
-                            "width": "90px"
-                        }
-
-                    ],
-                    "language": {
-                        "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                        return data.Descripcion
                     }
-            });
+                },
+                {
+                    "data": "oCategoria", render: function (data) {
+
+                        return data.Descripcion
+                    }
+                },
+                {
+                    "data": "oUnidad", render: function (data) {
+
+                        return data.Descripcion
+                    }
+                },
+                { "data": "Precio" },
+                { "data": "Stock" },
+                {
+                    "data": "Activo", "render": function (valor) {
+                        if (valor) {
+                            return '<span class="badge bg-success">Si</span>'
+                        } else {
+                            return '<span class="badge bg-danger">No</span>'
+                        }
+                    }
+                },
+                {
+                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"><i class="fas fa-pen"></i></button>' +
+                        '<button type="button" class="btn btn-danger btn-sm ms-2 btn-eliminar"><i class="fas fa-trash"></i></button>',
+                    "orderable": false,
+                    "searchable": false,
+                    "width": "90px"
+                }
+            ],
+            "language": {
+                "url":"//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
+            }
+        });
 
             //Rellenando categoria en el combobox de categoria 
 
@@ -294,12 +287,12 @@
                 },
             });
 
-        });
+        
 
         //se habre el modal al presionar el botón crear nuevo
         function abrirModal(json) {
             //Limpia los campos del modal form
-            $("#txtid").val();
+            $("#txtid").val(0);
             $("#img_producto").removeAttr("src");
             $("#fileProducto").val("");
             $("#txtnombre").val("");
@@ -345,7 +338,7 @@
 
             swal({
                 title: "Esta seguro?",
-                text: "¿Desea eliminar la marca",
+                text: "¿Desea eliminar el producto?",
                 type: "warning",
                 showCancelButton: true,
                 confirmButtonClass: true,
@@ -354,11 +347,12 @@
                 cancelButtonText: "No",
                 closeonConfirm: true
             },
+
             function () {
                  jQuery.ajax({
-                     url: '@Url.Action("EliminarMarca", "Mantenedor")',
+                     url: '@Url.Action("EliminarProducto", "Mantenedor")',
                      type: "POST",
-                     data: JSON.stringify({ id: data.IdMarca }),
+                     data: JSON.stringify({ id: data.IdProducto }),
                      dataType: "json",
                      contentType: "application/json; charset=utf-8",
                      success: function (data) { //El data son los mensajes resultados y demas valores que se esten enviando
@@ -379,6 +373,7 @@
 
             console.log(data);
         });
+
 
 
         function Guardar() {
