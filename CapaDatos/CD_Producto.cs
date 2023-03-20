@@ -79,13 +79,13 @@ namespace CapaDatos
 
         public List<Producto> Listar()
         {
-
             List<Producto> lista = new List<Producto>();
             using (SqlConnection oConexion = new SqlConnection(Conexion.cadena))
             {
                 SqlCommand cmd = new SqlCommand("SP_ListarProducto", oConexion);
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                
                 try
                 {
                     oConexion.Open();
@@ -101,7 +101,7 @@ namespace CapaDatos
                             oMarca = new Marca() { IdMarca = Convert.ToInt32(dr["IdMarca"].ToString()), Descripcion = dr["DesMarca"].ToString() },
                             oCategoria = new Categoria() { IdCategoria = Convert.ToInt32(dr["IdCategoria"].ToString()), Descripcion = dr["DesCategoria"].ToString() },
                             oUnidad = new Unidad() { IdUnidad = Convert.ToInt32(dr["IdUnidad"].ToString()), Descripcion = dr["DesUnidad"].ToString() },
-                            Precio = Convert.ToDecimal(dr["Precio"].ToString(), new CultureInfo("es-GT")),
+                            Precio = Convert.ToDecimal(dr ["Precio"].ToString()), // new CultureInfo("es-GT"),
                             Stock = Convert.ToInt32(dr["Stock"].ToString()),
                             RutaImagen = dr["RutaImagen"].ToString(),
                             NombreImagen = dr["NombreImagen"].ToString(),
