@@ -14,7 +14,7 @@
                 <div class="d-flex justify-content-between">
                     <div class="col-sm-9">
                         <h6>Total Clientes</h6>
-                        <h6 id="total-clientes">0</h6>
+                        <h6 id="totalcliente">0</h6>
                     </div>
                     <div class="col-sm-3">
                         <i class="fas fa-users fa-2x"></i>
@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="@Url.Action("Producto","Mantenedor")">Ver Detalles</a>
+                @*<a class="small text-white stretched-link" href="@Url.Action("Producto","Mantenedor")">Ver Detalles</a>*@
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
@@ -33,7 +33,7 @@
                 <div class="d-flex justify-content-between">
                     <div class="col-sm-9">
                         <h6>Total Ventas</h6>
-                        <h6 id="total-ventas">0</h6>
+                        <h6 id="totalventa">0</h6>
                     </div>
                     <div class="col-sm-3">
                         <i class="fas fa-shopping-bag fa-2x"></i>
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="@Url.Action("Marca","Mantenedor")">Ver Detalles</a>
+                @*<a class="small text-white stretched-link" href="@Url.Action("Marca","Mantenedor")">Ver Detalles</a>*@
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 <div class="d-flex justify-content-between">
                     <div class="col-sm-9">
                         <h6>Total Productos</h6>
-                        <h6 id="total-productos">0</h6>
+                        <h6 id="totalproducto">0</h6>
                     </div>
                     <div class="col-sm-3">
                         <i class="fas fa-boxes fa-2x"></i>
@@ -70,13 +70,101 @@
             <i class="fas fa-tags me-1"></i>
             Historial de Ventas
         </div>
+        <div class="card-body">
+            <form>
+
+                <div class="row align-items-end">
+                    <div class="col-sm-2">
+                        <div class="mb-2">
+                            <label class="form-label"> Fecha de Inicio: </label>
+                            <input class="form-control" type="text" id="txtfechainicio" name="fechainicio" />
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="mb-2">
+                            <label class="form-label"> Fecha Fin: </label>
+                            <input class="form-control" type="text" id="txtfechafin" name="fechafin" />
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="mb-2">
+                            <label class="form-label"> Id Transaccion: </label>
+                            <input class="form-control" type="text" id="txtidtransaccion" name="idtransaccion" />
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="d-grid mb-2">
+                            <button class="btn btn-primary" id="btnbuscar" type="button"> <i class="fas fa-search"></i> Buscar</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="d-grid mb-2">
+                            <button class="btn btn-success" id="btnbuscar" type="submit"> <i class="fas fa-file-excel"></i> Exportar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            @* Pinta una linea  *@
+            <hr /> 
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <table id="tabla" class="display cell-border" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Fecha Venta</th>
+                                <th>Cliente</th>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                                <th>ID Transaccion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
 
         @section scripts{
 
             <script>
-        $(document).ready(function () {
+                //Muestra los datos en el dashboard
+             jQuery.ajax({
+                url: '@Url.Action("VistaDashBoard", "Home")',
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    var objeto = data.resultado;
+                    $("#totalcliente").text(objeto.TotalCliente)
+                    $("#totalventa").text(objeto.TotalVenta)
+                    $("#totalproducto").text(objeto.TotalProducto)
+                }
+               
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        @*$(document).ready(function () {
             jQuery.ajax({
                 url: '@Url.Action("ListarProducto", "Mantenedor")',
                 type: "GET",
@@ -135,7 +223,7 @@
                 },
             });
 
-        })
+        })*@
             </script>
 
         }

@@ -518,6 +518,34 @@ go
 
 
 
+/* Dashboard*/
+create PROC SP_ReporteDashboard
+as
+begin
+select 
+(select count(*) from CLIENTE) [TotalCliente],
+(select isnull(sum(cantidad),0) from DETALLE_VENTA) [TotalVenta],
+(select count(*) from PRODUCTO) [TotalProducto]
+end
+
+
+/* Reporte de Ventas */
+create PROC SP_ReporteVentas(
+@fechainicio varchar(10),
+@fechafin varchar(10),
+@idtransaccion varchar(50)
+)
+as
+begin
+set dateformat dmy;
+select CONVERT( char(10), v.FechaVenta,103)[FechaVenta], CONCAT(c.Nombres,' ', c.Apellidos)[Cliente], p.Nombre[Producto], p.Precio, dv.Cantidad, dv.Total, v.IdTransaccion from DETALLE_VENTA dv
+inner join PRODUCTO p on p.IdProducto = dv.IdProducto
+inner join VENTA v on v.IdVenta = dv.IdVenta
+inner join CLIENTE c on c.IdCliente = v.IdCliente
+where convert(date, v.FechaVenta) between @fechainicio and @fechafin
+and v.IdTransaccion = iff(@idtransaccion = '',v.IdTransaccion,@idtransaccion)
+end
+
 
 /* INSERT USUARIO */
 select * from usuario
