@@ -543,7 +543,7 @@ inner join PRODUCTO p on p.IdProducto = dv.IdProducto
 inner join VENTA v on v.IdVenta = dv.IdVenta
 inner join CLIENTE c on c.IdCliente = v.IdCliente
 where convert(date, v.FechaVenta) between @fechainicio and @fechafin
-and v.IdTransaccion = iff(@idtransaccion = '',v.IdTransaccion,@idtransaccion)
+and v.IdTransaccion = IIF(@idtransaccion = '',v.IdTransaccion,@idtransaccion)
 end
 
 
