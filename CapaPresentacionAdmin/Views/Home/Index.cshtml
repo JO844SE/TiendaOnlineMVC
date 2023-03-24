@@ -133,9 +133,19 @@
 
         @section scripts{
 
-            <script>
-                //Muestra los datos en el dashboard
-             jQuery.ajax({
+    <script>
+
+
+        var tabladata;
+
+        $(document).ready(function () {
+                 //Muestra la fecha en los inputs, ademas despliega un calendario para seleccionar la fecha 
+                $("#txtfechainicio").datepicker({ dateFormat: 'dd/mm/yy' }).datepicker('setDate', new Date())
+                $("#txtfechafin").datepicker({ dateFormat: 'dd/mm/yy' }).datepicker('setDate', new Date())
+
+
+              //Muestra los datos en el dashboard
+            jQuery.ajax({
                 url: '@Url.Action("VistaDashBoard", "Home")',
                 type: "GET",
                 dataType: "json",
@@ -147,13 +157,51 @@
                     $("#totalventa").text(objeto.TotalVenta)
                     $("#totalproducto").text(objeto.TotalProducto)
                 }
-               
+       
+            });
+
+    //fechainicio, string fechafin, string idtransaccion
+            
+            var URL = '@Url.Action("ListarReporte", "Home")' +
+            "?fechainicio=" + $("#txtfechainicio").val() +
+            "&fechafin=" + $("#txtfechafin").val() +
+            "&idtransaccion=" + $("#txtidtransaccion").val() 
+
+
+            tabladata = $("#tabla").DataTable({
+                responsive: true,
+                ordering: false,
+                "ajax": {
+                    url: URL,
+                    type: "GET",
+                    "dataType": "json"
+                },
+                "columns": [
+                    {"data":"FechaVenta"},
+                    {"data":"Cliente"},
+                    {"data":"Producto"},
+                    {"data":"Precio"},
+                    {"data":"Cantidad"},
+                    {"data":"Total"},
+                    {"data":"IdTransaccion"}
+                ],
+                "language": {
+                    "url":"//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
+                }
+
             });
 
 
+        })
 
+        $("#btnbuscar").on("click", function () {
+                var nueva_url = '@Url.Action("ListarReporte", "Home")' +
+                "?fechainicio=" + $("#txtfechainicio").val() +
+                "&fechafin=" + $("#txtfechafin").val() +
+                "&idtransaccion=" + $("#txtidtransaccion").val()
 
-
+            tabladata.ajax.url(nueva_url).load();
+        })
 
 
 
