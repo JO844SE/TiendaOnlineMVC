@@ -167,5 +167,62 @@ namespace CapaDatos
         }
 
 
+        public bool CambiarClave(int idusuario, string nuevaclave, out string Mensaje)
+        {
+            bool resultado = false;
+            Mensaje = string.Empty;//Mensaje vacio
+
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                {
+
+                    SqlCommand cmd = new SqlCommand("update usuario set clave = @nuevaclave, reestablecer = 0 where idusuario = @id", oconexion); //Ejecuta el procedimiento almacenado
+                    cmd.Parameters.AddWithValue("@id", idusuario);//Paramétros de entrada
+                    cmd.Parameters.AddWithValue("@nuevaclave", nuevaclave);//Paramétros de entrada
+                    //Paramétros de salida 
+                    cmd.CommandType = CommandType.Text;//tipo de comando, texto
+                    oconexion.Open();//Abrimos la conexion
+                    resultado = cmd.ExecuteNonQuery() > 0 ? true : false;//Ejecutamos el comando
+
+                }
+            }
+            catch (Exception ex)
+            {
+                resultado = false;
+                Mensaje = ex.Message;
+            }
+            return resultado;
+        }
+
+
+        public bool ReestablecerClave(int idusuario, string clave, out string Mensaje)
+        {
+            bool resultado = false;
+            Mensaje = string.Empty;//Mensaje vacio
+
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                {
+
+                    SqlCommand cmd = new SqlCommand("update usuario set clave = @clave, reestablecer = 1 where idusuario = @id", oconexion); //Ejecuta el procedimiento almacenado
+                    cmd.Parameters.AddWithValue("@id", idusuario);//Paramétros de entrada
+                    cmd.Parameters.AddWithValue("@clave", clave);//Paramétros de entrada
+                    //Paramétros de salida 
+                    cmd.CommandType = CommandType.Text;//tipo de comando, texto
+                    oconexion.Open();//Abrimos la conexion
+                    resultado = cmd.ExecuteNonQuery() > 0 ? true : false;//Ejecutamos el comando
+
+                }
+            }
+            catch (Exception ex)
+            {
+                resultado = false;
+                Mensaje = ex.Message;
+            }
+            return resultado;
+        }
+
     }
 }

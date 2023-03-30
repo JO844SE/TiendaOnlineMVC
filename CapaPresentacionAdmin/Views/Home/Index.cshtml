@@ -71,7 +71,7 @@
             Historial de Ventas
         </div>
         <div class="card-body">
-            <form>
+            <form action="@Url.Action("ExportarVenta","Home")" method="post">
 
                 <div class="row align-items-end">
                     <div class="col-sm-2">
@@ -99,7 +99,7 @@
                     </div>
                     <div class="col-sm-2">
                         <div class="d-grid mb-2">
-                            <button class="btn btn-success" id="btnbuscar" type="submit"> <i class="fas fa-file-excel"></i> Exportar</button>
+                            <button class="btn btn-success" id="btnexportar" type="submit"> <i class="fas fa-file-excel"></i> Exportar</button>
                         </div>
                     </div>
                 </div>

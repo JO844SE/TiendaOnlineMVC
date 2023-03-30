@@ -30,8 +30,7 @@ namespace CapaDatos
                     {
                         while (dr.Read())
                         {
-                            lista.Add(
-                                new Reporte()
+                            lista.Add( new Reporte()
                                 {
                                     FechaVenta = dr["FechaVenta"].ToString(),
                                     Cliente = dr["Cliente"].ToString(),
