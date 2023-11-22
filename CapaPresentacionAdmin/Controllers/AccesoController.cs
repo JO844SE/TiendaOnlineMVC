@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using CapaEntidad;
 using CapaNegocio;
+using System.Web.Security;
 
 namespace CapaPresentacionAdmin.Controllers
 {
@@ -30,6 +31,7 @@ namespace CapaPresentacionAdmin.Controllers
         [HttpPost]
         public ActionResult Index(string correo, string clave)
         {
+            
             Usuario oUsuario = new Usuario();
             oUsuario = new CN_Usuarios().Listar().Where(u => u.Correo == correo && u.Clave == CN_Recursos.Convertirsha256(clave)).FirstOrDefault();
 
@@ -47,12 +49,20 @@ namespace CapaPresentacionAdmin.Controllers
                     TempData["IdUsuario"] = oUsuario.IdUsuario;
                     return RedirectToAction("CambiarClave");
                 }
+                else
+                {
+                    
+                    FormsAuthentication.SetAuthCookie(oUsuario.Correo, false);
 
-                ViewBag.Error = null;
-                return RedirectToAction("Index", "Home");
+                    Session["Usuario"] = oUsuario;
+
+                    ViewBag.Error = null;
+                    return RedirectToAction("Index", "Home");
+                }
+
+
             }
 
-            return View();
         }
 
 
@@ -122,7 +132,7 @@ namespace CapaPresentacionAdmin.Controllers
             if (respuesta)
             {
                 ViewBag.Error = null;
-                return RedirectToAction("Index","Acceso");
+                return RedirectToAction("Index", "Acceso");
             }
             else
             {
@@ -130,6 +140,14 @@ namespace CapaPresentacionAdmin.Controllers
                 return View();
 
             }
+
+        }
+
+        public ActionResult CerrarSesion()
+        {
+            Session["Usuario"] = null;
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Index", "Acceso");
 
         }
 

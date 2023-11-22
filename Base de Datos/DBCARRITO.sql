@@ -547,6 +547,33 @@ and v.IdTransaccion = iif(@idtransaccion = '',v.IdTransaccion,@idtransaccion)
 end
 
 
+
+/* Registro de clientes */
+create proc SP_RegistrarCliente(
+@Nombres varchar(100),
+@Apellidos varchar(100),
+@Correo varchar(100),
+@Clave varchar(100),
+@Mensaje varchar (500) output,
+@Resultado int output
+)
+as 
+begin
+	SET @Resultado = 0
+	IF NOT EXISTS (SELECT * FROM CLIENTE WHERE Correo = @Correo)
+	begin
+		insert into CLIENTE(Nombres,Apellidos,Correo,Clave,Reestablecer) values
+		(@Nombres,@Apellidos,@Correo,@Clave,0)
+
+		SET @Resultado = SCOPE_IDENTITY()
+		end
+		else
+		 set @Mensaje = 'El correo del usuario ya existe'
+end
+
+
+
+
 /* INSERT USUARIO */
 select * from usuario
 insert into usuario(Nombres,Apellidos,Correo,Clave) values ('Erik José','Pérez López','example@gmail.com','ecd71870d1963316a97e3ac3408c9835ad8cf0f3c1bc703527c30265534f75ae')

@@ -68,5 +68,10 @@ namespace CapaNegocio
         {
             return objMarca.Eliminar(id, out Mensaje);
         }
+
+         public List<Marca> ListarMarcaporCategoria(int idcategoria) {
+
+            return objMarca.ListarMarcaporCategoria(idcategoria);
+        }
     }
 }

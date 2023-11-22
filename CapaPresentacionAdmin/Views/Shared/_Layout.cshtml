@@ -1,13 +1,14 @@
-﻿@*Layout es mi master page*@
+﻿@using System.Security.Claims
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Mi aplicación ASP.NET</title>
     @Styles.Render("~/Content/css")
-    @*@Scripts.Render("~/bundles/modernizr")*@
+    @Scripts.Render("~/bundles/modernizr")
+
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -16,23 +17,27 @@
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <!-- Navbar Search-->
-        @*<form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-            <div class="input-group">
-                <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
-            </div>
-        </form>*@
+
+
+
+        @if (Session["Usuario"] != null)
+        {
+            <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#!"><b>@User.Identity.Name</b></a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" href="@Url.Action("CerrarSesion","Acceso")">Cerrar Sesion</a></li>
+                    </ul>
+                </li>
+            </ul>
+        }
+
+
+
         <!-- Navbar-->
-        <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="#!">Correo del Usuario</a></li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="@Url.Action("Index","Acceso")">Cerrar Sesion</a></li>
-                </ul>
-            </li>
-        </ul>
+
     </nav>
     @*Es la parte de los mantenedores*@
     <div id="layoutSidenav">
@@ -41,28 +46,34 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading">Resumen</div>
-                        <a class="nav-link" href="@Url.Action("Index","Home")"> @*se instancia la vista index del controler Home*@
+                        <a class="nav-link" href="@Url.Action("Index","Home")">
+                            @*se instancia la vista index del controler Home*@
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        <a class="nav-link" href="@Url.Action("Usuarios","Home")">@*se instancia la vista Usuarios del controler Home*@
+                        <a class="nav-link" href="@Url.Action("Usuarios","Home")">
+                            @*se instancia la vista Usuarios del controler Home*@
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Usuarios
                         </a>
                         <div class="sb-sidenav-menu-heading">Mantenimiento</div>
-                        <a class="nav-link" href="@Url.Action("Categoria","Mantenedor")">@*se instancia la vista Categoria del controler Mantenedor*@
+                        <a class="nav-link" href="@Url.Action("Categoria","Mantenedor")">
+                            @*se instancia la vista Categoria del controler Mantenedor*@
                             <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                             Categorías
                         </a>
-                        <a class="nav-link" href="@Url.Action("Marca","Mantenedor")">@*se instancia la vista Marca del controler Mantenedor*@
+                        <a class="nav-link" href="@Url.Action("Marca","Mantenedor")">
+                            @*se instancia la vista Marca del controler Mantenedor*@
                             <div class="sb-nav-link-icon"><i class="fas fa-bookmark"></i></div>
                             Marcas
                         </a>
-                        <a class="nav-link" href="@Url.Action("UnidadMedida","Mantenedor")">@*se instancia la vista UnidadMedida del controler Mantenedor*@
+                        <a class="nav-link" href="@Url.Action("UnidadMedida","Mantenedor")">
+                            @*se instancia la vista UnidadMedida del controler Mantenedor*@
                             <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             Unidad de Medida
                         </a>
-                        <a class="nav-link" href="@Url.Action("Producto","Mantenedor")">@*se instancia la vista Producto del controler Mantenedor*@
+                        <a class="nav-link" href="@Url.Action("Producto","Mantenedor")">
+                            @*se instancia la vista Producto del controler Mantenedor*@
                             <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
                             Productos
                         </a>
@@ -80,7 +91,7 @@
                     @RenderBody()@*Se indica que es en este contenedor donde se mostraran las vistas*@
                 </div>
             </main>
-            
+
         </div>
     </div>
 
