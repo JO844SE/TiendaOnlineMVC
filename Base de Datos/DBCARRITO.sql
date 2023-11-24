@@ -527,6 +527,7 @@ select
 (select isnull(sum(cantidad),0) from DETALLE_VENTA) [TotalVenta],
 (select count(*) from PRODUCTO) [TotalProducto]
 end
+go
 
 
 /* Reporte de Ventas */
@@ -545,6 +546,7 @@ inner join CLIENTE c on c.IdCliente = v.IdCliente
 where convert(date, v.FechaVenta) between @fechainicio and @fechafin
 and v.IdTransaccion = iif(@idtransaccion = '',v.IdTransaccion,@idtransaccion)
 end
+go
 
 
 
@@ -570,7 +572,132 @@ begin
 		else
 		 set @Mensaje = 'El correo del usuario ya existe'
 end
+go
 
+
+
+/* Existe Carrito */
+create proc SP_ExisteCarrito(
+@IdCliente int,
+@IdProducto int,
+@Resultado bit output
+)
+as
+begin
+	if exists(select * from CARRITO where IdCliente = @IdCliente and IdProducto = @IdProducto)
+		set @Resultado = 1
+	else
+		set @Resultado = 0
+end
+go
+
+
+/* Operación  Carrito */
+create proc SP_OperacionCarrito(
+@IdCliente int,
+@IdProducto int,
+@Sumar bit,
+@Mensaje varchar(500) output,
+@Resultado bit output
+)
+as
+begin
+	set @Resultado = 1
+	set @Mensaje = ''
+
+
+	declare @existecarrito bit = iif(exists(select * from CARRITO where IdCliente = @IdCliente and IdProducto = @IdProducto),1,0)
+	declare @strockproducto int = (select stock from PRODUCTO where IdProducto  = @IdProducto)
+
+	BEGIN TRY
+		
+		BEGIN TRANSACTION OPERACION
+
+		if(@Sumar = 1)
+		begin
+
+			if(@strockproducto > 0)
+			begin
+
+				if(@existecarrito = 1)
+					update CARRITO set Cantidad = Cantidad + 1 where IdCliente = @IdCliente and IdProducto = @IdProducto
+				else
+					insert into CARRITO(IdCliente, IdProducto, Cantidad) Values (@IdCliente,@IdProducto,1)
+
+
+				update PRODUCTO set Stock = Stock - 1 where IdProducto = @IdProducto
+			end
+			else
+			begin
+				set @Resultado = 0
+				set @Mensaje = 'El producto no cuenta con stock disponible'
+			end
+
+
+		end
+		else
+		begin
+			update CARRITO set Cantidad = Cantidad - 1 where IdCliente = @IdCliente and IdProducto = @IdProducto 
+			update PRODUCTO set Stock = Stock + 1 where IdProducto = @IdProducto
+			
+		end
+		
+		COMMIT TRANSACTION OPERACION
+		
+	END TRY
+	BEGIN CATCH
+		set @Resultado = 0
+		set @Mensaje =  ERROR_MESSAGE()
+		ROLLBACK TRANSACTION OPERACION
+	END CATCH 
+end
+go
+
+/* Obtener Lista de producto Cliente en carrito*/
+create function fn_obtenerCarritoCliente(
+@idcliente int
+)
+returns table 
+as
+return(
+	select p.IdProducto, m.Descripcion[DesMarca],p.Nombre,p.Precio,c.Cantidad,p.RutaImagen,p.NombreImagen
+	from CARRITO	c
+	inner join PRODUCTO p on p.IdProducto = c.IdProducto
+	inner join MARCA m on m.IdMarca = p.IdMarca
+	where c.IdCliente = @idcliente
+)
+go
+
+
+/* Eliminar producto del carrito carrito*/
+create proc SP_EliminarCarrito(
+@IdCliente int,
+@IdProducto int,
+@Resultado bit output
+)
+as
+begin
+
+	set @Resultado = 1
+	declare @cantidadproducto int = (select Cantidad from CARRITO where IdCliente = @IdCliente and IdProducto = @IdProducto)
+
+	BEGIN TRY
+
+		BEGIN TRANSACTION OPERACION
+
+		update PRODUCTO set Stock = stock + @cantidadproducto where IdProducto = @IdProducto
+		delete top(1) from CARRITO where IdCliente = @IdCliente and IdProducto = @IdProducto
+
+		COMMIT TRANSACTION OPERACION
+
+	END TRY
+	BEGIN CATCH
+		set @Resultado = 0
+		ROLLBACK TRANSACTION OPERACION
+	END CATCH
+end
+go
+ 
 
 
 
