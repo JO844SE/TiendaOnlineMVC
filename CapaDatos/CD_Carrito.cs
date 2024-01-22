@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Data.SqlClient;
 using CapaEntidad;
+using System.Globalization;
 
 namespace CapaDatos
 {
     public class CD_Carrito
     {
+
+        //CultureInfo guatemalaCulture = new CultureInfo("es-GT");
+
         //procedimiento almacenado para registrar usuarios 
         public bool ExisteCarrito(int idcliente, int idproducto)
         {
@@ -149,7 +153,7 @@ namespace CapaDatos
                             oMarca = new Marca() { IdMarca = Convert.ToInt32(dr["IdMarca"].ToString()), Descripcion = dr["DesMarca"].ToString() },
                             oCategoria = new Categoria() { IdCategoria = Convert.ToInt32(dr["IdCategoria"].ToString()), Descripcion = dr["DesCategoria"].ToString() },
                             oUnidad = new Unidad() { IdUnidad = Convert.ToInt32(dr["IdUnidad"].ToString()), Descripcion = dr["DesUnidad"].ToString() },
-                            Precio = Convert.ToDecimal(dr["Precio"].ToString()), // new CultureInfo("es-GT"),
+                            Precio = Convert.ToDecimal(dr["Precio"].ToString(), new CultureInfo("es-GT")),
                             Stock = Convert.ToInt32(dr["Stock"].ToString()),
                             RutaImagen = dr["RutaImagen"].ToString(),
                             NombreImagen = dr["NombreImagen"].ToString(),
