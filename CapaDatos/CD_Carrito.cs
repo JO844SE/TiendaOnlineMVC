@@ -129,50 +129,89 @@ namespace CapaDatos
 
 
 
-        public List<Producto> Listar()
+        public List<Carrito> ListarProducto(int idcliente)
         {
-            List<Producto> lista = new List<Producto>();
-            using (SqlConnection oConexion = new SqlConnection(Conexion.cadena))
+            List<Carrito> lista = new List<Carrito>();
+            try
             {
-                SqlCommand cmd = new SqlCommand("SP_ListarProducto", oConexion);
-                cmd.CommandType = CommandType.StoredProcedure;
 
-
-                try
+                using (SqlConnection oConexion = new SqlConnection(Conexion.cadena))
                 {
+                    string query = "select * from fn_obtenerCarritoCliente(@idcliente)";
+                    SqlCommand cmd = new SqlCommand(query, oConexion);
+                    cmd.Parameters.AddWithValue("@idcliente", idcliente);
+                    cmd.CommandType = CommandType.Text;
+
                     oConexion.Open();
-                    SqlDataReader dr = cmd.ExecuteReader();
 
-                    while (dr.Read())
+                    using (SqlDataReader dr = cmd.ExecuteReader())
                     {
-                        lista.Add(new Producto()
+                        while (dr.Read())
                         {
-                            IdProducto = Convert.ToInt32(dr["IdProducto"].ToString()),
-                            Nombre = dr["Nombre"].ToString(),
-                            Descripcion = dr["Descripcion"].ToString(),
-                            oMarca = new Marca() { IdMarca = Convert.ToInt32(dr["IdMarca"].ToString()), Descripcion = dr["DesMarca"].ToString() },
-                            oCategoria = new Categoria() { IdCategoria = Convert.ToInt32(dr["IdCategoria"].ToString()), Descripcion = dr["DesCategoria"].ToString() },
-                            oUnidad = new Unidad() { IdUnidad = Convert.ToInt32(dr["IdUnidad"].ToString()), Descripcion = dr["DesUnidad"].ToString() },
-                            Precio = Convert.ToDecimal(dr["Precio"].ToString(), new CultureInfo("es-GT")),
-                            Stock = Convert.ToInt32(dr["Stock"].ToString()),
-                            RutaImagen = dr["RutaImagen"].ToString(),
-                            NombreImagen = dr["NombreImagen"].ToString(),
-                            Activo = Convert.ToBoolean(dr["Activo"].ToString())
-                        });
+                            lista.Add(new Carrito()
+                            {
+                                oProducto = new Producto()
+                                {
+                                    IdProducto = Convert.ToInt32(dr["IdProducto"].ToString()),
+                                    Nombre = dr["Nombre"].ToString(),
+                                    Precio = Convert.ToDecimal(dr["Precio"].ToString(), new CultureInfo("es-GT")),
+                                    RutaImagen = dr["RutaImagen"].ToString(),
+                                    NombreImagen = dr["NombreImagen"].ToString(),
+                                    oMarca = new Marca() { Descripcion = dr["DesMarca"].ToString() }
+
+                                }
+                            });
+                        }
                     }
-                    dr.Close();
-
-                    return lista;
-
-                }
-                catch (Exception ex)
-                {
-                    lista = null;
-                    return lista;
                 }
             }
+            catch
+            {
+
+                lista = new List<Carrito>();
+            }
+            return lista;
+            
         }
 
+
+        public bool EliminarCarrito(int idcliente, int idproducto)
+        {
+            bool resultado = true;
+
+
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                {
+
+                    SqlCommand cmd = new SqlCommand("SP_EliminarCarrito", oconexion); //Ejecuta el procedimiento almacenado
+                    cmd.Parameters.AddWithValue("IdCliente", idcliente);//Paramétros de entrada
+                    cmd.Parameters.AddWithValue("IdProducto", idproducto);
+                    //Paramétros de salida 
+                    cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                    cmd.CommandType = CommandType.StoredProcedure;//tipo de comando, procedimiento almacenado
+
+
+
+                    oconexion.Open();//Abrimos la conexion
+
+                    cmd.ExecuteNonQuery();
+
+                    resultado = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                resultado = false;
+
+            }
+
+            return resultado;
+        }
 
     }
 }

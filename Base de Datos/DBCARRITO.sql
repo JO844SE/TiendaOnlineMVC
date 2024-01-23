@@ -119,7 +119,7 @@ IdDistrito varchar(6) not null,
 Descripcion varchar(50) not null,
 IdProvincia varchar(4) not null,
 IdDepartamento varchar (2) not null
-)
+)go
 
 
 
@@ -654,7 +654,7 @@ end
 go
 
 /* Obtener Lista de producto Cliente en carrito*/
-create function fn_obtenerCarritoCliente(
+create proc fn_obtenerCarritoCliente(
 @idcliente int
 )
 returns table 
@@ -667,6 +667,8 @@ return(
 	where c.IdCliente = @idcliente
 )
 go
+
+select * from fn_obtenerCarritoCliente(2)
 
 
 /* Eliminar producto del carrito carrito*/
@@ -743,6 +745,12 @@ insert into provincia (IdProvincia, Descripcion, IdDepartamento) values
 
 /* INSERT DISTRITO */
 select * from distrito
-insert into distrito(IdDistrito, Descripcion, IdProvincia, IdDepartamento) values
-('031452','Las Manzanas','1201','01')
+insert into DISTRITO(IdDistrito, Descripcion, IdProvincia, IdDepartamento) values
+('1452','El Durazno','1201','01')
 
+
+select * from departamento
+
+select * from PROVINCIA where IdDepartamento = @iddepartamento
+
+select * from DISTRITO where IdProvincia = 1201 and IdDepartamento = @iddepartamento
