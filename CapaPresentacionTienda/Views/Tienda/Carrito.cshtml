@@ -16,7 +16,7 @@
                             <div class="me-2">
                                 <div class="d-flex justify-content-between">
                                     <h5 class="ms-2 mt-2">Detalle Carrito</h5>
-                                    <a class="btn btn-primary" href="@Url.Action("Index","Tienda")"><i class="fas fa-cart-plus"></i>Seguir Comprando</a>
+                                    <a class="btn btn-primary" href="@Url.Action("Index","Tienda")"><i class="fas fa-cart-plus "></i> Seguir Comprando</a>
 
                                 </div>
                                 <hr class="mt-2 mb-2">
@@ -61,7 +61,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-end">
-                                    <label class="align-self-center" ><b>Total: Q. <span id="total">900</span></b></label>
+                                    <label class="align-self-center" ><b>Total: Q. <span id="total">0</span></b></label>
                                 </div>
                             </div>
 
@@ -171,7 +171,8 @@
 
                                     //5
                                     $("<div>").addClass("col-sm-2 align-self-center").append(
-                                        $("<button>").addClass("btn btn-outline-danger btn-eliminar").append($("<i>").addClass("far fa-trash-alt"), " Eliminar"),
+                                        $("<button>").addClass("btn btn-outline-danger btn-eliminar").append($("<i>").addClass("far fa-trash-alt"), " Eliminar")
+                                            .data("idproducto",item.oProducto.IdProducto),
                                     )
 
                                 )
@@ -179,8 +180,18 @@
                             )
                            
                         ).appendTo("#productos-carrito")
-                    } )
+                    })
+
+                    sumarTotal();
+                },
+                error: function (error) {
+                    $("#productos-carrito").LoadingOverlay("hide");
+                },
+                beforeSend: function () {
+                    $("#productos-carrito").LoadingOverlay("show");
                 }
+
+                
             })
 
 
@@ -259,6 +270,127 @@
             })
 
         }
+
+
+        function sumarTotal() {
+            var sumaTotal = parseFloat(0)
+            $("input.input-cantidad").each(function (i) {
+                var precio = $(this).data("oProducto").Precio;
+                var cantidad = parseFloat($(this).val())
+
+                var subtotal = precio * cantidad;
+                sumaTotal += subtotal;
+            })
+
+            $("#total").text(sumaTotal.toFixed(2))
+            $("#total").data("sumatotal",sumaTotal)
+        }
+
+        $(document).on("click", ".btn-sumar", function () {
+            var div_contenedor = $(this).parent("div.d-flex");
+            var input_cantidad = $(div_contenedor).find("input.input-cantidad");
+            var btn = $(this)
+
+            var idproducto = $(input_cantidad).data("oProducto").IdProducto;
+
+            jQuery.ajax({
+                url: '@Url.Action("OperacionCarrito","Tienda")',
+                type: "POST",
+                data: JSON.stringify({ idproducto: idproducto, sumar: true}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $(btn).LoadingOverlay("hide")
+
+                    if (data.respuesta) {
+                        var cantidad = parseInt($(input_cantidad).val()) + 1;
+                        $(input_cantidad).val(cantidad)
+                        sumarTotal()
+                    } else {
+                        swal("",data.mensaje, "warning")
+                    }
+                },
+                beforeSend: function () {
+                    $(btn).LoadingOverlay("show")
+                },
+                error: function (error) {
+                    $(btn).LoadingOverlay("hide")
+                }
+            })
+
+        })
+
+
+        $(document).on("click", ".btn-restar", function () {
+            var div_contenedor = $(this).parent("div.d-flex");
+            var input_cantidad = $(div_contenedor).find("input.input-cantidad");
+            var btn = $(this)
+
+            var idproducto = $(input_cantidad).data("oProducto").IdProducto;
+            var cantidad = parseInt($(input_cantidad).val()) - 1;
+
+                if (cantidad >= 1) {
+                    jQuery.ajax({
+                        url: '@Url.Action("OperacionCarrito","Tienda")',
+                        type: "POST",
+                        data: JSON.stringify({ idproducto: idproducto, sumar: false}),
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            $(btn).LoadingOverlay("hide")
+
+                            if (data.respuesta) {
+                        
+                                $(input_cantidad).val(cantidad)
+                                sumarTotal()
+                            } else {
+                                swal("",data.mensaje, "warning")
+                            }
+                        },
+                        beforeSend: function () {
+                            $(btn).LoadingOverlay("show")
+                        },
+                        error: function (error) {
+                            $(btn).LoadingOverlay("hide")
+                        }
+                    })
+                 }
+
+            
+
+        })
+
+
+         $(document).on("click", ".btn-eliminar", function () {
+         
+            var idproducto = $(this).data("idproducto");
+             var card_producto = $(this).parents("div.card-producto");
+
+                jQuery.ajax({
+                    url: '@Url.Action("EliminarCarrito","Tienda")',
+                    type: "POST",
+                    data: JSON.stringify({ idproducto: idproducto}),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                       
+
+                        if (data.respuesta) {
+
+                            card_producto.remove();
+
+                            MostrarCantidadCarrito();
+
+                            sumarTotal();
+
+                        } else {
+                            swal("",data.mensaje, "warning")
+                        }
+                    }
+                })
+        } )
+
+
     </script>
 
 }

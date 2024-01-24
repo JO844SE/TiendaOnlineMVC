@@ -150,6 +150,8 @@ namespace CapaDatos
                         {
                             lista.Add(new Carrito()
                             {
+
+
                                 oProducto = new Producto()
                                 {
                                     IdProducto = Convert.ToInt32(dr["IdProducto"].ToString()),
@@ -158,8 +160,12 @@ namespace CapaDatos
                                     RutaImagen = dr["RutaImagen"].ToString(),
                                     NombreImagen = dr["NombreImagen"].ToString(),
                                     oMarca = new Marca() { Descripcion = dr["DesMarca"].ToString() }
+                                   
 
-                                }
+                                 },
+
+                                Cantidad = Convert.ToInt32(dr["Cantidad"].ToString())
+
                             });
                         }
                     }

@@ -147,7 +147,7 @@ namespace CapaPresentacionTienda.Controllers
                     Precio = oc.oProducto.Precio,
                     RutaImagen = oc.oProducto.RutaImagen,
                     Base64 = CN_Recursos.ConvertirBase64(Path.Combine(oc.oProducto.RutaImagen, oc.oProducto.NombreImagen), out conversion),
-                    Extension = Path.GetExtension(oc.oProducto.NombreImagen)
+                    Extension = Path.GetExtension(oc.oProducto.NombreImagen),
                 },
                 Cantidad = oc.Cantidad
             }).ToList();
