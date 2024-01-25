@@ -654,7 +654,7 @@ end
 go
 
 /* Obtener Lista de producto Cliente en carrito*/
-create proc fn_obtenerCarritoCliente(
+create function fn_obtenerCarritoCliente(
 @idcliente int
 )
 returns table 
@@ -760,10 +760,21 @@ go
 
 
 
+ /* Procedimiento para ver los pedidos hechos  */
+ create function fn_ListarCompra(
+@idcliente int
+)
+returns table 
+as
+return(
+	select p.RutaImagen,p.NombreImagen,p.Nombre,p.Precio,dv.Cantidad,dv.Total,v.IdTransaccion from DETALLE_VENTA dv
+	inner join PRODUCTO p on p.IdProducto = dv.IdProducto
+	inner join VENTA v on v.IdVenta = dv.IdVenta
+	where v.IdCliente = @idcliente
+)
+go
 
-
-
-
+select * from fn_ListarCompra(1)
 
 
 

@@ -8,17 +8,24 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using CapaPresentacionAdmin.Filter;
 
 namespace CapaPresentacionAdmin.Controllers
 {
     public class HomeController : Controller
     {
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
         public ActionResult Index()
         {
             return View();
         }
 
 
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
         public ActionResult Usuarios()
         {
             return View();

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Globalization;
 using Newtonsoft.Json;
+using CapaPresentacionTienda.Filter;
 
 namespace CapaPresentacionTienda.Controllers
 {
@@ -225,7 +226,9 @@ namespace CapaPresentacionTienda.Controllers
             return Json(new { lista = oLista }, JsonRequestBehavior.AllowGet);
         }
 
-
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
         public ActionResult Carrito(){
             return View();
 
@@ -272,6 +275,12 @@ namespace CapaPresentacionTienda.Controllers
             return Json(new { Status = true, Link = "/Tienda/PagoEfectuado?IdTransaccion=\"" + IdTransaccion + "\"&status=true" }, JsonRequestBehavior.AllowGet);
         }
 
+
+
+
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
         public async Task<ActionResult> PagoEfectuado()
         {
             string idtransaccion = Request.QueryString["idTransaccion"];
@@ -295,6 +304,36 @@ namespace CapaPresentacionTienda.Controllers
             }
             return View();
         }
+
+
+
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
+        public ActionResult MisCompras()
+        {
+            int idcliente = ((Cliente)Session["Cliente"]).IdCliente;
+
+            List<DetalleVenta> oLista = new List<DetalleVenta>();
+            bool conversion;
+
+            oLista = new CN_Venta().ListarCompras(idcliente).Select(oc => new DetalleVenta()
+            {
+                oProducto = new Producto()
+                {
+                    Nombre = oc.oProducto.Nombre,
+                    Precio = oc.oProducto.Precio,
+                    Base64 = CN_Recursos.ConvertirBase64(Path.Combine(oc.oProducto.RutaImagen, oc.oProducto.NombreImagen), out conversion),
+                    Extension = Path.GetExtension(oc.oProducto.NombreImagen),
+                },
+                Cantidad = oc.Cantidad,
+                Total = oc.Total,
+                IdTransaccion = oc.IdTransaccion
+            }).ToList();
+
+            return View(oLista);
+        }
+
 
     }
 }

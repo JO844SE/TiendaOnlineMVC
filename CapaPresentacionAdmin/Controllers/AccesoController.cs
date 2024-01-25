@@ -38,7 +38,7 @@ namespace CapaPresentacionAdmin.Controllers
             if (oUsuario == null)
             {
 
-                ViewBag.Error = "Coreo y contraseña incorectos";
+                ViewBag.Error = "Correo y contraseña incorectos";
                 return View();
 
             }

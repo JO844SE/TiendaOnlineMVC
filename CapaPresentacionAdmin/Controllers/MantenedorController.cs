@@ -9,16 +9,46 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using CapaPresentacionAdmin.Filter;
 
 namespace CapaPresentacionAdmin.Controllers
 {
     public class MantenedorController : Controller
     {
         // GET: Mantenedor
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
         public ActionResult Categoria()
         {
             return View();
         }
+
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
+        public ActionResult Marca()
+        {
+            return View();
+        }
+
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
+        public ActionResult UnidadMedida()
+        {
+            return View();
+        }
+        //se valida la sesion, unicamente con aquellos que han iniciado sesión
+        [ValidarSession]
+        [Authorize]
+        public ActionResult Producto()
+        {
+            return View();
+        }
+
+
+
 
         //+++++++++++++++++++++++++++++++++++++ CATEGORIA ++++++++++++++++++++++++++++++++++++++++++++++++
         #region CATEGORIA
@@ -300,31 +330,5 @@ namespace CapaPresentacionAdmin.Controllers
         #endregion
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public ActionResult Marca()
-        {
-            return View();
-        }
-
-        public ActionResult UnidadMedida()
-        {
-            return View();
-        }
-        public ActionResult Producto()
-        {
-            return View();
-        }
     }
 }
