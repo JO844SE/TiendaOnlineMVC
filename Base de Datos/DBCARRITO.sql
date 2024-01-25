@@ -81,7 +81,7 @@ go
 
 CREATE TABLE DETALLE_VENTA(
 IdDetalleVenta int primary key identity,
-IdVenta int references Venta(IdVenta),
+IdVenta int references Venta(IdVenta) on delete cascade,
 IdProducto int references Producto(IdProducto),
 Cantidad int,
 Total decimal (10,2)
@@ -524,7 +524,7 @@ as
 begin
 select 
 (select count(*) from CLIENTE) [TotalCliente],
-(select isnull(sum(cantidad),0) from DETALLE_VENTA) [TotalVenta],
+(select count(*) from VENTA) [TotalVenta],
 (select count(*) from PRODUCTO) [TotalProducto]
 end
 go
@@ -539,7 +539,7 @@ create PROC SP_ReporteVentas(
 as
 begin
 set dateformat dmy;
-select CONVERT( char(10), v.FechaVenta,103)[FechaVenta], CONCAT(c.Nombres,' ', c.Apellidos)[Cliente], p.Nombre[Producto], p.Precio, dv.Cantidad, dv.Total, v.IdTransaccion from DETALLE_VENTA dv
+select CONVERT( char(10), v.FechaVenta,103)[FechaVenta], CONCAT(c.Nombres,' ', c.Apellidos)[Cliente], v.Telefono[Telefono],v.Direccion[Direccion], p.Nombre[Producto], p.Precio, dv.Cantidad, dv.Total, v.IdTransaccion from DETALLE_VENTA dv
 inner join PRODUCTO p on p.IdProducto = dv.IdProducto
 inner join VENTA v on v.IdVenta = dv.IdVenta
 inner join CLIENTE c on c.IdCliente = v.IdCliente

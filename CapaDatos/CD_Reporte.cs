@@ -34,6 +34,8 @@ namespace CapaDatos
                                 {
                                     FechaVenta = dr["FechaVenta"].ToString(),
                                     Cliente = dr["Cliente"].ToString(),
+                                    Telefono = dr["Telefono"].ToString(),
+                                    Direccion = dr["Direccion"].ToString(),
                                     Producto = dr["Producto"].ToString(),
                                     Precio = Convert.ToDecimal(dr["Precio"].ToString()),
                                     Cantidad = Convert.ToInt32(dr["Cantidad"].ToString()),

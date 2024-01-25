@@ -11,6 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Data;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace CapaPresentacionTienda.Controllers
 {
@@ -242,6 +243,7 @@ namespace CapaPresentacionTienda.Controllers
             detalle_venta.Columns.Add("Cantidad", typeof(string));
             detalle_venta.Columns.Add("Total", typeof(string));
 
+
             foreach (Carrito oCarrito in oListaCarrito)
             {
                 decimal subtotal = Convert.ToDecimal(oCarrito.Cantidad.ToString()) * oCarrito.oProducto.Precio;
@@ -261,8 +263,13 @@ namespace CapaPresentacionTienda.Controllers
             TempData["Venta"] = oVenta;
             TempData["DetalleVenta"] = detalle_venta;
 
-            return Json(new { Status = true, Link = "/Tienda/PagoEfectuado?idTransaccion=code0001&status=true" }, JsonRequestBehavior.AllowGet);
+            
+            int idcorrelativo = new CN_Carrito().ObtenerCorrelativo();
+            string IdTransaccion = string.Format("{0:00000}", idcorrelativo);
+   
 
+
+            return Json(new { Status = true, Link = "/Tienda/PagoEfectuado?IdTransaccion=\"" + IdTransaccion + "\"&status=true" }, JsonRequestBehavior.AllowGet);
         }
 
         public async Task<ActionResult> PagoEfectuado()

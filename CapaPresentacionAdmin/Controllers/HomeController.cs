@@ -98,6 +98,8 @@ namespace CapaPresentacionAdmin.Controllers
             dt.Locale = new System.Globalization.CultureInfo("es-GT");
             dt.Columns.Add("Fecha Venta", typeof(string));
             dt.Columns.Add("Cliente", typeof(string));
+            dt.Columns.Add("Telefono", typeof(string));
+            dt.Columns.Add("Direccion", typeof(string));
             dt.Columns.Add("Producto", typeof(string));
             dt.Columns.Add("Precio", typeof(decimal));
             dt.Columns.Add("Cantidad", typeof(int));
@@ -110,6 +112,8 @@ namespace CapaPresentacionAdmin.Controllers
                 dt.Rows.Add(new object[] {
                     rp.FechaVenta,
                     rp.Cliente,
+                    rp.Telefono,
+                    rp.Direccion,
                     rp.Producto,
                     rp.Precio,
                     rp.Cantidad,

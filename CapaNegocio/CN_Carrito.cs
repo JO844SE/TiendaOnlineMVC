@@ -37,5 +37,11 @@ namespace CapaNegocio
             return objCarrito.EliminarCarrito(idcliente, idproducto);
         }
 
+
+        public int ObtenerCorrelativo()
+        {
+            return objCarrito.ObtenerCorrelativo();
+        }
+
     }
 }
