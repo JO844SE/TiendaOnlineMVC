@@ -286,6 +286,8 @@
             $("#total").data("sumatotal",sumaTotal)
         }
 
+
+
         $(document).on("click", ".btn-sumar", function () {
             var div_contenedor = $(this).parent("div.d-flex");
             var input_cantidad = $(div_contenedor).find("input.input-cantidad");
@@ -327,7 +329,7 @@
             var btn = $(this)
 
             var idproducto = $(input_cantidad).data("oProducto").IdProducto;
-            var cantidad = parseInt($(input_cantidad).val()) - 1;
+                var cantidad = parseInt($(input_cantidad).val()) - 1;
 
                 if (cantidad >= 1) {
                     jQuery.ajax({
@@ -340,7 +342,6 @@
                             $(btn).LoadingOverlay("hide")
 
                             if (data.respuesta) {
-                        
                                 $(input_cantidad).val(cantidad)
                                 sumarTotal()
                             } else {

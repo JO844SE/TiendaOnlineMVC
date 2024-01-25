@@ -129,6 +129,11 @@ namespace CapaDatos
 
 
 
+        //Sumar stock de carrito
+       
+
+
+
         public List<Carrito> ListarProducto(int idcliente)
         {
             List<Carrito> lista = new List<Carrito>();
