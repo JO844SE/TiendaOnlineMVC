@@ -19,6 +19,7 @@ namespace CapaPresentacionTienda.Controllers
     public class TiendaController : Controller
     {
         // GET: Tienda
+
         public ActionResult Index()
         {
             return View();
@@ -61,6 +62,8 @@ namespace CapaPresentacionTienda.Controllers
             lista = new CN_Marca().ListarMarcaporCategoria(idcategoria);
             return Json(new { data = lista }, JsonRequestBehavior.AllowGet);
         }
+
+
 
         [HttpPost]
         public JsonResult ListarProducto(int idcategoria, int idmarca)
